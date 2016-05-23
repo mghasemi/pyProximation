@@ -75,6 +75,8 @@ class OrthSystem:
 		from itertools import product
 		if self.Env == "sympy":
 			from sympy import sin, cos, pi
+		elif self.Env == 'sage':
+			from sage.all import sin, cos, pi
 		B = []
 		for o in product(range(n+1), repeat=self.num_vars):
 			if sum(o) <= n:
