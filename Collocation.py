@@ -7,7 +7,7 @@
 #                  http://www.gnu.org/licenses/                                #
 #******************************************************************************#
 
-from sage.all import *
+#from sage.all import *
 
 def DetSymEnv():
 	Env = []
