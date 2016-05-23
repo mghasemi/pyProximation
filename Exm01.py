@@ -8,7 +8,7 @@ M = Measure([(-1, 1)], lambda x:1./sqrt(1.-x**2))
 S = OrthSystem([x], [(-1, 1)])
 #S.SetMeasure(M)
 B = S.PolyBasis(n)
-B = S.FourierBasis(n)
+#B = S.FourierBasis(n)
 S.Basis(B)
 S.FormBasis()
 

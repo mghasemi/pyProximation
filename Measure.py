@@ -149,6 +149,12 @@ class Measure:
 						pnts.append(v)
 				points += pnts
 			return random.sample(set(points), num)
+		else:
+			from scipy import stats
+			TotM = self.measure(self.supp)
+			dist = [float(self.weight[p])/TotM for p in self.supp]
+			custm = stats.rv_discrete(name='custm', values=(self.supp, dist))
+			return custm.rvs(size=num)
 ##################################################################################################
 class OrthSystem:
 	"""
