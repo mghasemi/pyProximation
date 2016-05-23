@@ -121,7 +121,12 @@ class OrthSystem:
 		if self.Env == "sympy":
 			from sympy import lambdify
 			F = lambdify(self.Vars, f*g, "numpy")
-			m = self.measure.integral(F)
+		elif self.Env == "sage":
+			from sage.all import fast_callable
+			h = f*g +self.Vars[0]*0
+			H = fast_callable(h, vars=self.Vars)
+			F = lambda *x: H(*x)
+		m = self.measure.integral(F)
 		return m
 
 	def project(self, f, g):
@@ -141,6 +146,8 @@ class OrthSystem:
 		"""
 		if self.Env == 'sympy':
 			from sympy import expand, sqrt
+		elif self.Env == 'sage':
+			from sage.all import expand, sqrt
 		for f in self.OriginalBasis:
 			nf = 0
 			for u in self.OrthBase:

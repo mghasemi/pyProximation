@@ -97,7 +97,7 @@ class Collocation:
 			from sympy import Symbol as var
 			from sympy import Subs, expand, diff
 		elif self.Env == 'sage':
-			from sage.all import var
+			from sage.all import var, expand, diff
 		# symbols for coefficients
 		var_syms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
 		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'
@@ -126,7 +126,10 @@ class Collocation:
 					if self.Env == 'sage':
 						for d_ord in range(1,6):
 							Teq = Teq.subs({diff(f, v, d_ord):diff(self.SR[var_syms[f_idx]], v, d_ord)})
-					Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+					if self.Env == 'sympy':
+						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+					else:
+						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
 				f_idx += 1
 			if Teq not in self.REq:
 				self.REq.append(Teq)
