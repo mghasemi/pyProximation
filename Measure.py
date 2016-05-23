@@ -234,7 +234,7 @@ class OrthSystem:
 		if self.Env == "sympy":
 			from sympy import sin, cos, pi
 		elif self.Env == 'sage':
-			from sage.all import *
+			from sage.all import sin, cos, pi
 		B = []
 		for o in product(range(n+1), repeat=self.num_vars):
 			if sum(o) <= n:
@@ -279,7 +279,12 @@ class OrthSystem:
 		if self.Env == "sympy":
 			from sympy import lambdify
 			F = lambdify(self.Vars, f*g, "numpy")
-			m = self.measure.integral(F)
+		elif self.Env == "sage":
+			from sage.all import fast_callable
+			h = f*g +self.Vars[0]*0
+			H = fast_callable(h, vars=self.Vars)
+			F = lambda *x: H(*x)
+		m = self.measure.integral(F)
 		return m
 
 	def project(self, f, g):
@@ -299,6 +304,8 @@ class OrthSystem:
 		"""
 		if self.Env == 'sympy':
 			from sympy import expand, sqrt
+		elif self.Env == 'sage':
+			from sage.all import expand, sqrt
 		for f in self.OriginalBasis:
 			nf = 0
 			for u in self.OrthBase:
@@ -417,7 +424,7 @@ class Collocation:
 			from sympy import Symbol as var
 			from sympy import Subs, expand, diff
 		elif self.Env == 'sage':
-			from sage.all import var
+			from sage.all import var, expand, diff
 		# symbols for coefficients
 		var_syms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
 		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'
@@ -446,7 +453,10 @@ class Collocation:
 					if self.Env == 'sage':
 						for d_ord in range(1,6):
 							Teq = Teq.subs({diff(f, v, d_ord):diff(self.SR[var_syms[f_idx]], v, d_ord)})
-					Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+					if self.Env == 'sympy':
+						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+					else:
+						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
 				f_idx += 1
 			if Teq not in self.REq:
 				self.REq.append(Teq)
