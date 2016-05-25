@@ -1,5 +1,5 @@
 from sympy import *
-from Measure import *
+from IntgDiff import *
 x = Symbol('x')
 y = Function('y')(x)
 
