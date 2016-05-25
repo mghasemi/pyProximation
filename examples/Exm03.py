@@ -64,3 +64,4 @@ G.SetLabelZ("$y(t, x)$")
 G.Plot3D(Apprx[0], (t, 0, 1), (x, 0, 1))
 
 G.save('Exm3-%d.png'%(n))
+G.interact()
