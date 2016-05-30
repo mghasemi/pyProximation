@@ -24,6 +24,8 @@ class Measure:
 	def boxCheck(self, B):
 		"""
 		Checks the structure of the box `B`.
+		Returns `True` id `B` is a list of 2-tuples, otherwise it 
+		returns `False`.
 		"""
 		flag = True
 		for interval in B:
@@ -32,7 +34,8 @@ class Measure:
 
 	def check(self, dom, w):
 		"""
-		Checks the input types and their consistency
+		Checks the input types and their consistency, according to the 
+		`__init__` arguments.
 		"""
 		from types import FunctionType, IntType, LongType, FloatType
 		if type(dom) == list:
@@ -65,6 +68,7 @@ class Measure:
 	def measure(self, S):
 		"""
 		Returns the measure of the set `S`.
+		`S` must be a list of 2-tuples.
 		"""
 		m = 0
 		if self.DomType == "set":
