@@ -1,5 +1,5 @@
-from .base import Foundation
-from .measure import Measure
+from base import Foundation
+from measure import Measure
 
 class OrthSystem(Foundation):
 	"""

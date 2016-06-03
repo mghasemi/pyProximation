@@ -1,5 +1,5 @@
-from .base import Foundation
-from .orthsys import OrthSystem
+from base import Foundation
+from orthsys import OrthSystem
 
 class Collocation(Foundation):
 	"""

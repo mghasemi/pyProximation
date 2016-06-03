@@ -1,4 +1,7 @@
 class Foundation:
+	"""
+	This class contains common features of all modules.
+	"""
 	def __init__(self):
 		pass
 

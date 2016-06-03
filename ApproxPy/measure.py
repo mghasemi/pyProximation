@@ -1,4 +1,4 @@
-from .base import Foundation
+from base import Foundation
 
 class Measure(Foundation):
 	"""
