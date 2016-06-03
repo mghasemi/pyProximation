@@ -1,14 +1,12 @@
 class Collocation:
 	"""
-	`Collocation` class tries to approximate the solutions of a system
+	The `Collocation` class tries to approximate the solutions of a system
 	of partial differential equations with respect to an orthogonal
 	system of functions.
 
-	To initiate an instance of this class one needs to provide two set
-	of parameters:
+	To initiate an instance of this class one needs to provide two set of parameters:
 		1) List of independent symbolic variables `variables`;
-		2) List of unknown functions to be found that depend on the
-		independent variables `ufunc`.
+		2) List of unknown functions to be found that depend on the independent variables `ufunc`.
 	"""
 	def __init__(self, variables, ufunc, env='sympy'):
 		Env = self.DetSymEnv()
@@ -33,7 +31,7 @@ class Collocation:
 	def DetSymEnv(self):
 		"""
 		Returns a list. The list consists of all symbolic tools 
-		present among 'sympy' and 'sage'.
+		present among `sympy` and `sage`.
 		"""
 		Env = []
 		from sys import modules
@@ -74,9 +72,9 @@ class Collocation:
 	def setSolver(self, solver):
 		"""
 		Currently only two solvers are supported:
-			1) `sage`s defult solver for rather simple system of algebraic
-			equations.
-			2) `scipy`s `fsolves` to handel more complex and larger systems.
+		
+			1. the `sage`\`s defult solver for rather simple system of algebraic equations.
+			2. the `scipy`\`s `fsolves` to handel more complex and larger systems.
 		"""
 		self.Solver = solver.lower()
 
@@ -84,7 +82,8 @@ class Collocation:
 		"""
 		Accepts alist of collocation point `pnts`, to form the algebraic 
 		system of equations and find the coefficients of the orthogonal 
-		functions from `OrthogonalSystem.OrthBase`.
+		functions from `OrthogonalSystem.OrthBase`. Each point must be 
+		either a list or a tuple.
 		"""
 		self.Points += pnts
 

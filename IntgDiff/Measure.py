@@ -1,19 +1,25 @@
 class Measure:
 	"""
-	An instance of this class is a measure on a given set `supp`.
-	The support is either 
-		-- a python variable of type `set`, or
-		-- a list of tuples which represents a box in euclidean space.
+	An instance of this class is a measure on a given set `supp`. The support is either 
+		+ a python variable of type `set`, or
+		+ a list of tuples which represents a box in euclidean space.
+	Initializes a measure object according to the inputs:
+		+ *dom* must be either
+			- a list of 2-tuples
+			- a non-empty dictionary
+		+ *w* must be a
+			- a function if `dom` defines a region
+			- left blank (None) if `dom` is a dictionary
 	"""
 	def __init__(self, dom, w=None):
 		"""
 		Initializes a measure object according to the inputs:
-			--`dom` must be either
-				-- a list of 2-tuples
-				-- a non-empty dictionary
-			-- `w` must be a
-				-- a function if `dom` defines a region
-				-- left blank (None) if `dom` is a dictionary
+			+`dom` must be either
+				- a list of 2-tuples
+				- a non-empty dictionary
+			+ `w` must be a
+				- a function if `dom` defines a region
+				- left blank (None) if `dom` is a dictionary
 		"""
 		self.ErrorMsg = ""
 		self.dim = 0
@@ -23,7 +29,7 @@ class Measure:
 
 	def boxCheck(self, B):
 		"""
-		Checks the structure of the box `B`.
+		Checks the structure of the box *B*.
 		Returns `True` id `B` is a list of 2-tuples, otherwise it 
 		returns `False`.
 		"""
@@ -35,7 +41,7 @@ class Measure:
 	def check(self, dom, w):
 		"""
 		Checks the input types and their consistency, according to the 
-		`__init__` arguments.
+		*__init__* arguments.
 		"""
 		from types import FunctionType, IntType, LongType, FloatType
 		if type(dom) == list:
@@ -114,7 +120,7 @@ class Measure:
 
 	def norm(self, p, f):
 		"""
-		Computes the norm-p of the `f` with respect to the current measure.
+		Computes the norm-`p` of the `f` with respect to the current measure.
 		"""
 		from math import pow
 		absfp = lambda *x: pow(abs(f(*x)), p)

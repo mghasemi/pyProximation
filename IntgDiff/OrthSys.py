@@ -12,6 +12,10 @@ class OrthSystem:
 	To initiate an instance of this class one should provide a list of
 	symbolic variables `variables` and the range of each variable as a
 	list of lists `var_range`.
+
+		To initiate an orthogonal system of functions, one should provide
+		a list of symbolic variables `variables` and the range of each 
+		these variables as a list of lists `var_range`.
 	"""
 
 	def __init__(self, variables, var_range, env='sympy'):
@@ -69,7 +73,7 @@ class OrthSystem:
 	def FourierBasis(self, n):
 		"""
 		Generates a Fourier basis from variables consisting of all
-		sin & cos functions with coefficients at most `n`.
+		`sin` & `cos` functions with coefficients at most `n`.
 		"""
 		assert n>=0, "'n' must be a positive integer."
 		from itertools import product
@@ -97,7 +101,7 @@ class OrthSystem:
 		"""
 		To set the measure which the orthogonal system will be computed,
 		simply call this method with the corresponding distribution as
-		its parameter `dm`; i.e, the parameter is 'd(m)'' where `m' is 
+		its parameter `dm`; i.e, the parameter is `d(m)` where `m` is 
 		the original measure.
 		"""
 		assert isinstance(M, Measure), "The argument must be a `Measure`."
@@ -116,7 +120,7 @@ class OrthSystem:
 	def inner(self, f, g):
 		"""
 		Computes the inner product of the two parameters with respect to
-		the measure `_pdf`.
+		the measure `measure`.
 		"""
 		if self.Env == "sympy":
 			from sympy import lambdify
@@ -132,7 +136,7 @@ class OrthSystem:
 	def project(self, f, g):
 		"""
 		Finds the projection of `f` on `g` with respect to the inner 
-		product induced by the measure `_pdf`.
+		product induced by the measure `measure`.
 		"""
 		return g*self.inner(f, g)/self.inner(g, g)
 
@@ -142,7 +146,7 @@ class OrthSystem:
 		to the given basis via `Basis` method.
 		The result will be stored in a property called `OrthBase` which
 		is a list of function that are orthogonal to each other with
-		respect to the measure `_pdf` over the given range `Domain`.
+		respect to the measure `measure` over the given range `Domain`.
 		"""
 		if self.Env == 'sympy':
 			from sympy import expand, sqrt

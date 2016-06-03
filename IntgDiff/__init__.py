@@ -1,1 +1,1 @@
-__all__ = ['Measure', 'OrthSys', 'Collocation']
+__all__ = ['Measure', 'OrthSys', 'Interpolation', 'Collocation', 'Graphics']

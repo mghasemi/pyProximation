@@ -2,6 +2,12 @@ class Graphics:
 	"""
 	This class tends to provide basic graphic tools based on `matplotlib` 
 	and `mayavi`.
+	
+	Accepts one optional argument `env` which determines the types of the function to be visualized:
+
+		- `numeric`: is a numerical function (regular python functions)
+		- `sympy`: Sympy symbolic function
+		- `sage`: Sage symbolic function
 	"""
 	def __init__(self, env='numeric', numpoints=50):
 		"""
@@ -18,6 +24,11 @@ class Graphics:
 		self.X = []
 		self.Y = []
 		self.Z = []
+		self.pX = []
+		self.pY = []
+		self.pZ = []
+		self.pColor = []
+		self.pMarker =[]
 		self.xlabel = '$x$'
 		self.ylabel = '$y$'
 		self.zlabel = '$z$'
@@ -28,6 +39,8 @@ class Graphics:
 		self.zmin = None
 		self.zmax = None
 		self.legend = []
+		self.plegend = []
+		self.thickness = []
 		self.grid = True
 		self.PlotCount = 0
 		self.PlotType = ''
@@ -56,12 +69,42 @@ class Graphics:
 		"""
 		self.title = ttl
 
-	def Plot2D(self, func, xrng, color='blue', legend=""):
+	def Point(self, pnts, color='blue', marker="o", legend=""):
+		"""
+		Adds a list of points to the plot.
+		"""
+		if len(pnts[0])==2:
+			self.PlotType = '2D'
+			TX = []
+			TY = []
+			for p in pnts:
+				TX.append(p[0])
+				TY.append(p[1])
+			self.pX.append(TX)
+			self.pY.append(TY)
+		elif len(pnts[0]):
+			self.PlotType = '3D'
+			TX = []
+			TY = []
+			TZ = []
+			for p in pnts:
+				TX.append(p[0])
+				TY.append(p[1])
+				TZ.append(p[2])
+			self.pX.append(TX)
+			self.pY.append(TY)
+			self.pZ.append(TZ)
+		self.pColor.append(color)
+		self.pMarker.append(marker)
+		self.plegend.append(legend)
+		self.thickness.append(1)
+
+	def Plot2D(self, func, xrng, color='blue', legend="", thickness=1):
 		"""
 		Appends a curve to the Graphics object. The parameters are as follows:
+
 			- `func`: the function to be plotted,
-			- `xrng`: a triple of the form `(x, a, b)`, where `x` is the `func`s
-			independents variable, over the range `[a, b]`,
+			- `xrng`: a triple of the form `(x, a, b)`, where `x` is the `func`'s independents variable, over the range `[a, b]`,
 			- `color`: the color of the current curve,
 			- `legend`: the text for the legend of the current crve.
 		"""
@@ -81,12 +124,12 @@ class Graphics:
 		else:
 			raise Exception("The function type is not recognized. Only 'numeric', 'sympy' and 'sage' are accepted.")
 
-		if self.X == []:
-			stp_lngt = float(xrng[2] - xrng[1])/self.NumPoints
-			self.X = [xrng[1]+i*stp_lngt for i in range(self.NumPoints+1)]
-			self.xmin = xrng[1]
-			self.xmax = xrng[2]
-		TempY = [f_(x) for x in self.X]
+		#if self.X == []:
+		stp_lngt = float(xrng[2] - xrng[1])/self.NumPoints
+		self.X.append([xrng[1]+i*stp_lngt for i in range(self.NumPoints+1)])
+		self.xmin = xrng[1]
+		self.xmax = xrng[2]
+		TempY = [f_(x) for x in self.X[-1]]
 		if self.ymin is None:
 			self.ymin = min(TempY)
 			self.ymax = max(TempY)
@@ -96,16 +139,68 @@ class Graphics:
 		self.Y.append(TempY)
 		self.color.append(color)
 		self.legend.append(legend)
+		self.thickness.append(thickness)
+		self.PlotCount += 1
+
+	def ParamPlot2D(self, funcs, rng, color='blue', legend="", thickness=1):
+		"""
+		Appends a parametric curve to the Graphics object. The parameters are as follows:
+
+			- ``funcs``: the tupleof functions to be plotted,
+			- ``rng``: a triple of the form `(t, a, b)`, where `t` is the `funcs`'s independents variable, over the range `[a, b]`,
+			- ``color``: the color of the current curve,
+			- ``legend``: the text for the legend of the current crve.
+		"""
+		if self.PlotType == '':
+			self.PlotType = '2D'
+		elif self.PlotType != '2D':
+			raise Exception("Cannot combine 2d and 3d plots")
+
+		if self.Env == 'numeric':
+			f_0 = funcs[0]
+			f_1 = funcs[1]
+		elif self.Env == 'sympy':
+			from sympy import lambdify
+			f_0 = lambdify(rng[0], funcs[0], "numpy")
+			f_1 = lambdify(rng[0], funcs[1], "numpy")
+		elif self.Env == 'sage':
+			from sage.all import fast_callable
+			f_0 = fast_callable(funcs[0], vars=[rng[0]])
+			f_1 = fast_callable(funcs[1], vars=[rng[0]])
+		else:
+			raise Exception("The function type is not recognized. Only 'numeric', 'sympy' and 'sage' are accepted.")
+
+		#if self.X == []:
+		stp_lngt = float(rng[2] - rng[1])/self.NumPoints
+		line_points = [rng[1]+i*stp_lngt for i in range(self.NumPoints+1)]
+		TempX = [f_0(t) for t in line_points]
+		self.X.append(TempX)
+		if self.xmin is None:
+			self.xmin = min(TempX)
+			self.xmax = max(TempX)
+		else:
+			self.xmin = min(min(TempX), self.xmin)
+			self.xmax = max(max(TempX), self.xmax)
+		TempY = [f_1(t) for t in line_points]
+		if self.ymin is None:
+			self.ymin = min(TempY)
+			self.ymax = max(TempY)
+		else:
+			self.ymin = min(min(TempY), self.ymin)
+			self.ymax = max(max(TempY), self.ymax)
+		self.Y.append(TempY)
+		self.color.append(color)
+		self.legend.append(legend)
+		self.thickness.append(thickness)
 		self.PlotCount += 1
 
 	def Plot3D(self, func, xrng, yrng):
 		"""
 		Sets a surface to the Graphics object. The parameters are as follows:
-			- `func`: the function to be plotted,
-			- `xrng`: a triple of the form `(x, a, b)`, where `x` is the first 
-			`func`s independents variable, over the range `[a, b]`,
-			- `yrng`: a triple of the form `(y, c, d)`, where `x` is the second
-			`func`s	independents variable, over the range `[c, d]`.
+
+			- ``func``: the function to be plotted,
+			- ``xrng``: a triple of the form `(x, a, b)`, where `x` is the first `func`s independents variable, over the range `[a, b]`,
+			- ``yrng``: a triple of the form `(y, c, d)`, where `x` is the second `func`'s	independents variable, over the range `[c, d]`.
 		"""
 		import numpy as np
 		if self.PlotType == '':
@@ -124,12 +219,12 @@ class Graphics:
 		else:
 			raise Exception("The function type is not recognized. Only 'numeric', 'sympy' and 'sage' are accepted.")
 		#self.f_ = f_
+		x_stp_lngt = float(xrng[2] - xrng[1])/self.NumPoints
+		y_stp_lngt = float(yrng[2] - yrng[1])/self.NumPoints
 		if self.X == []:
-			x_stp_lngt = float(xrng[2] - xrng[1])/self.NumPoints
 			self.X = [xrng[1]+i*x_stp_lngt for i in range(self.NumPoints+1)]
 			self.xmin = xrng[1]
 			self.xmax = xrng[2]
-			y_stp_lngt = float(yrng[2] - yrng[1])/self.NumPoints
 			self.Y = [yrng[1]+i*y_stp_lngt for i in range(self.NumPoints+1)]
 			self.ymin = yrng[1]
 			self.ymax = yrng[2]
@@ -148,17 +243,21 @@ class Graphics:
 		import numpy as np
 		if self.PlotType == '2D':
 			import matplotlib.pyplot as plt
-			
-			plt.axis([self.xmin, self.xmax, self.ymin, self.ymax])
+			try:
+				plt.axis([self.xmin, self.xmax, self.ymin, self.ymax])
+			except:
+				pass
 			if self.title != "":
 				plt.title(self.title)
 			if self.xlabel != '':
 				plt.xlabel(self.xlabel, color='gray')
 			if self.ylabel != '':
 				plt.ylabel(self.ylabel, color='gray')
+			for idx in range(len(self.pX)):
+				plt.plot(self.pX[idx], self.pY[idx], color=self.pColor[idx], marker=self.pMarker[idx], ls='')
 			for idx in range(self.PlotCount):
-				plt.plot(self.X, self.Y[idx], color=self.color[idx])
-			plt.legend(self.legend, loc=2)
+				plt.plot(self.X[idx], self.Y[idx], color=self.color[idx], linewidth=self.thickness[idx])
+			plt.legend(self.plegend+self.legend, loc=2)
 			plt.grid(self.grid)
 
 		elif self.PlotType == '3D':
@@ -175,7 +274,11 @@ class Graphics:
 			#ax.set_ylim3d(self.ymin, self.ymax)
 			#ax.set_zlim3d(0, 1)
 			ax = fig.gca(projection='3d')
-			ax.plot_surface(self.X, self.Y, self.Z, rstride=1, cstride=1, linewidth=.1, cmap=cm.jet)
+			alpha = 1
+			for idx in range(len(self.pX)):
+				alpha = .6
+				ax.scatter(self.pX[idx], self.pY[idx], self.pZ[idx], color=self.pColor[idx], marker=self.pMarker[idx])
+			ax.plot_surface(self.X, self.Y, self.Z, rstride=1, cstride=1, linewidth=.1, cmap=cm.jet, alpha=alpha)
 
 		plt.savefig(fname)
 
