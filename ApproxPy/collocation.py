@@ -1,4 +1,7 @@
-class Collocation:
+from .base import Foundation
+from .orthsys import OrthSystem
+
+class Collocation(Foundation):
 	"""
 	The `Collocation` class tries to approximate the solutions of a system
 	of partial differential equations with respect to an orthogonal

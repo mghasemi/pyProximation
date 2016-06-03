@@ -11,9 +11,9 @@ elif Symbolic == 'sage':
 	x = var('x')
 	y = function('y')(t, x)
 
-from IntgDiff import *
+from ApproxPy import *
 
-n = 2
+n = 3
 
 S = OrthSystem([t, x], [(0, 1), (0, 1)])
 B = S.PolyBasis(n)

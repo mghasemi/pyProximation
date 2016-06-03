@@ -9,13 +9,12 @@ elif Symbolic == 'sage':
 	x = var('x')
 	y = function('y')(x)
 
-from IntgDiff import *
-
+from ApproxPy import *
 
 n = 6
 M = Measure([(-1, 1)], lambda x:1./sqrt(1.-x**2))
 S = OrthSystem([x], [(-1, 1)], Symbolic)
-#S.SetMeasure(M)
+S.SetMeasure(M)
 B = S.PolyBasis(n)
 #B = S.FourierBasis(n)
 S.Basis(B)

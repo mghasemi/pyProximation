@@ -1,4 +1,7 @@
-class OrthSystem:
+from .base import Foundation
+from .measure import Measure
+
+class OrthSystem(Foundation):
 	"""
 	`OrthogonalSystem` class produces an orthogonal system of functions
 	according to a suggested basis of functions and a given measure 
@@ -40,19 +43,6 @@ class OrthSystem:
 		self.OriginalBasis = []
 		self.OrthBase = []
 		self.Numerical = False
-
-	def DetSymEnv(self):
-		"""
-		Returns a list. The list consists of all symbolic tools 
-		present among 'sympy' and 'sage'.
-		"""
-		Env = []
-		from sys import modules
-		if 'sympy' in modules:
-			Env.append('sympy')
-		if 'sage' in modules:
-			Env.append('sage')
-		return Env
 
 	def PolyBasis(self, n):
 		"""

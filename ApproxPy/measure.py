@@ -1,4 +1,6 @@
-class Measure:
+from .base import Foundation
+
+class Measure(Foundation):
 	"""
 	An instance of this class is a measure on a given set `supp`. The support is either 
 		+ a python variable of type `set`, or

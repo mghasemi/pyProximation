@@ -1,5 +1,5 @@
 from sympy import *
-from IntgDiff import *
+from ApproxPy import *
 
 x = Symbol('x')
 y = Function('y')(x)
@@ -20,8 +20,10 @@ S.FormBasis()
 f = exp(x*sin(x))
 sries = S.Series(f)
 intrpl = sum([S.OrthBase[i]*sries[i] for i in range(m)])
+
 print intrpl
-G = plot(f, intrpl, (x, -3.1, 3.1), show=False)
-G[0].line_color = 'blue'
-G[1].line_color = 'green'
+
+G = Graphics('sympy')
+G.Plot2D(f, (x, -3.1, 3.1), legend='exact')
+G.Plot2D(intrpl, (x, -3.1, 3.1), color='green', legend='approximation')
 G.save('Exm04-%d.png'%(n))
