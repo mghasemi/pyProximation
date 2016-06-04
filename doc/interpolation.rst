@@ -57,7 +57,7 @@ interpolates the given list of points and their corresponding values. Here :math
 The above procedure is implemented in the ``Interpolation`` module. The following code provides an example in 2 dimensional case::
 
 	from sympy import *
-	from IntgDiff import Interpolation
+	from pyProximation import Interpolation
 	# define symbolic variables
 	x = Symbol('x')
 	y = Symbol('y')

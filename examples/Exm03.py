@@ -11,7 +11,7 @@ elif Symbolic == 'sage':
 	x = var('x')
 	y = function('y')(t, x)
 
-from ApproxPy import *
+from pyProximation import *
 
 n = 3
 

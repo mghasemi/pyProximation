@@ -31,7 +31,7 @@ The ``Collocation`` class implements the above described method. The follwing ex
 :math:`\frac{dy}{dx} + 2y + 5 \int y dx = 1`, :math:`y(0)=y(2\pi)=0` where the exact solution is :math:`\frac{1}{2}\sin(2x)e^{-x}`::
 
 	from sympy import *
-	from IntgDiff import *
+	from pyProximation import *
 	# symbolic variable
 	x = Symbol('x')
 	# symbolic function
@@ -74,7 +74,7 @@ One can provide prefered collocation points to the solver. The following repeats
 the domain within a fix distance from each other::
 
 	from sympy import *
-	from IntgDiff import *
+	from pyProximation import *
 	# symbolic variable
 	x = Symbol('x')
 	# symbolic function
@@ -144,7 +144,7 @@ with initial conditions :math:`x(0) = 4` and :math:`y(0) = 3`. The exact solutio
 The following code solves the system and plots the exact and approximate solutions::
 
 	from sympy import *
-	from IntgDiff import *
+	from pyProximation import *
 	# symbolic variable
 	t = Symbol('t')
 	# symbolic function

@@ -14,7 +14,7 @@ The following plots a list of random points in 3D::
 
 	from random import uniform
 	# import the module
-	from IntgDiff import Graphics
+	from pyProximation import Graphics
 	# list of random points
 	points = [(uniform(-10, 10), uniform(-10, 10), uniform(-10, 10)) for _ in range(100)]
 	# the graphic object
@@ -27,7 +27,7 @@ The following plots a list of random points in 3D::
 .. image:: ./images/points.png
    :height: 400px
 
-2 Dimensional Plots
+Two Dimensional Plots
 =========================
 
 The method ``Plot2D`` is to plot curves in 2 dimensions.
@@ -45,7 +45,7 @@ The following code shows an example::
 		x = var('x')
 		y = function('y')(x)
 	# import the modules
-	from IntgDiff import *
+	from pyProximation import *
 	# size of basis
 	n = 6
 	# set the measure
@@ -115,7 +115,7 @@ The following code shows an example::
 
 For an example of parametric plots see :ref:`this <ParamPlotExm>`.
 
-3 Dimensional Plots
+Three Dimensional Plots
 =========================
 
 To generate static 3 dimensional plots, ``Graphics`` implement ``Plot3D``.
@@ -134,7 +134,7 @@ The following example illustrates the usage of this method::
 		x = var('x')
 		y = function('y')(t, x)
 	# import the modules
-	from IntgDiff import *
+	from pyProximation import *
 	# degree of basis
 	n = 4
 	# orthogonal system

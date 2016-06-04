@@ -51,3 +51,11 @@ include interactive ones based on `mayavi`.
 
 
 For more detals refer to the documentation.
+
+To build the documentation run::
+
+	$ sphinx-build -b html ./doc/ ./doc/_build
+
+or from ``./doc`` run ``$ make html``.
+
+To generate a pdf file run ``$ make latexpdf``. This requires `latex` to be available.

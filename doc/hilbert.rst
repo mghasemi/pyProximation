@@ -109,7 +109,7 @@ The following code generates Legendre polynomials up to a given order::
 
 	# the symbolic package
 	from sympy import *
-	from IntgDiff import Measure, OrthSystem
+	from pyProximation import Measure, OrthSystem
 	# the symbolic variable
 	x = Symbol('x')
 	# set a limit to the order
@@ -140,7 +140,7 @@ The following code generates Chebyshev polynomials up to a given order::
 	# the symbolic package
 	from sympy import *
 	from numpy import sqrt
-	from IntgDiff import Measure, OrthSystem
+	from pyProximation import Measure, OrthSystem
 	# the symbolic variable
 	x = Symbol('x')
 	# set a limit to the order
@@ -181,7 +181,7 @@ The following code calculates the Fourier series approximation of :math:`f(x)=\s
 
 	from sympy import *
 	from numpy import sqrt
-	from IntgDiff import Measure, OrthSystem
+	from pyProximation import Measure, OrthSystem
 	# the symbolic variable
 	x = Symbol('x')
 	# set a limit to the order

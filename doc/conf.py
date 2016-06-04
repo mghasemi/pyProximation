@@ -18,8 +18,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../ApproxPy/'))
-sys.path.insert(0, os.path.abspath('./src/'))
+sys.path.insert(0, os.path.abspath('../pyProximation/'))
 # sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
@@ -57,7 +56,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ApproxPy'
+project = u'pyProximation'
 copyright = u'2016, Mehdi Ghasemi'
 author = u'Mehdi Ghasemi'
 
@@ -154,7 +153,7 @@ html_theme = 'bizstyle'
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-# html_logo = None
+html_logo = './images/pyProxLogo.png'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -245,7 +244,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ApproxPydoc'
+htmlhelp_basename = 'pyProximationDoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -271,14 +270,14 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ApproxPy.tex', u'ApproxPy Documentation',
+    (master_doc, 'pyProximation.tex', u'pyProximation Documentation',
      u'Mehdi Ghasemi', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #
-# latex_logo = None
+latex_logo = './images/pyProxLogoSmall.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -307,7 +306,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'approxpy', u'ApproxPy Documentation',
+    (master_doc, 'pyproximation', u'pyProximation Documentation',
      [author], 1)
 ]
 
@@ -322,8 +321,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ApproxPy', u'ApproxPy Documentation',
-     author, 'ApproxPy', 'One line description of project.',
+    (master_doc, 'pyProximation', u'pyProximation Documentation',
+     author, 'pyProximation', 'One line description of project.',
      'Miscellaneous'),
 ]
 

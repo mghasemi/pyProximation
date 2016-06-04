@@ -9,7 +9,7 @@ elif Symbolic == 'sage':
 	x = var('x')
 	y = function('y')(x)
 
-from ApproxPy import *
+from pyProximation import *
 
 n = 6
 M = Measure([(-1, 1)], lambda x:1./sqrt(1.-x**2))

@@ -1,5 +1,5 @@
 from sympy import *
-from ApproxPy import *
+from pyProximation import *
 
 x = Symbol('x')
 y = Function('y')(x)

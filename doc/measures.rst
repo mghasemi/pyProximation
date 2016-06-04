@@ -5,7 +5,7 @@ Measures
 Density function
 =========================
 
-The `IntgDiff` implements two different scenarios for measure spaces:
+The `pyProximation` implements two different scenarios for measure spaces:
 	1. Continuous case, where support of the measure is given as a compact subspace (box) of :math:`\mathbb{R}^n`, and
 	2. Discrete case, where a finite set of points and their weights are given.
 
@@ -25,7 +25,7 @@ For example, the following code defines the Lebesgue measure on :math:`[-1, 1]\t
 the set :math:`[0, 1]\times[-1, 0]`::
 
 	# import the Measure class
-	from IntgDiff import Measure
+	from pyProximation import Measure
 	# define the support of the measure
 	D = [(-1, 1), (-1, 1)]
 	# define the measure with the constant density 1
@@ -47,7 +47,7 @@ Then the measure of a subset :math:`S=\{x_{i_1},\dots,x_{i_k}\}` of `X` is given
 The following is a sample code for discrete case::
 	
 	# import the Measure class
-	from IntgDiff import Measure
+	from pyProximation import Measure
 	# define the support and density
 	D = {'x1':1, 'x2':.5, 'x3':1.1, 'x4':.6}
 	# define the measure
@@ -64,7 +64,7 @@ Suppose that a measure space :math:`(X, \mu)` and a measurable function `f` on `
 If :math:`\mu` is discrete, then `f` can be a dictionary with keys as points of domain and values as evaluation at each point.
 Otherwise, `f` is simply a numerical function::
 
-	from IntgDiff import Measure
+	from pyProximation import Measure
 	from numpy import sqrt
 	# define the density function
 	w = lambda x:1./sqrt(1.-x**2)
@@ -79,7 +79,7 @@ Otherwise, `f` is simply a numerical function::
 
 Or in two dimensions::
 
-	from IntgDiff import Measure
+	from pyProximation import Measure
 	from numpy import sqrt
 	# define the density function
 	w = lambda x, y:y**2/sqrt(1.-x**2)
