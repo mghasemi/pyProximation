@@ -8,7 +8,7 @@ Orthonormal system of functions
 Let `X` be a topological space and :math:`\mu` be a finite Borel measure on `X`. The bilinear function :math:`\langle\cdot,\cdot\rangle` defined
 on :math:`L^2(X, \mu)` as :math:`\langle f, g\rangle = \int_X fg d\mu` is an inner product which turns :math:`L^2(X, \mu)` into a Hilbert space.
 
-Let us denote the family of all continuous real valued functions on a non-empty compact apace `X` by :math:`\textrm{C}(X)`. Suppose that among elements 
+Let us denote the family of all continuous real valued functions on a non-empty compact space `X` by :math:`\textrm{C}(X)`. Suppose that among elements 
 of :math:`\textrm{C}(X)`, a subfamily `A` of functions are of particular interest. 
 Suppose that `A` is a subalgebra of :math:`\textrm{C}(X)` containing constants.
 We say that an element :math:`f\in\textrm{C}(X)` can be approximated by elements of `A`, if for every :math:`\epsilon>0`, there exists 
@@ -132,7 +132,7 @@ The following code generates Legendre polynomials up to a given order::
 Chebyshev polynomials
 ----------------------------
 
-Let :math:`d\mu(x)=\frac{dx}{\sqrt{1-x^2}}` on :math:`[-1, 1]` and `B` as in Legendre polynomias. The orthonormal polynomials associated to this setting 
+Let :math:`d\mu(x)=\frac{dx}{\sqrt{1-x^2}}` on :math:`[-1, 1]` and `B` as in Legendre polynomials. The orthonormal polynomials associated to this setting 
 are called *Chebyshev* polynomials and the :math:`n^{th}` one is denoted by :math:`T_n(x)`.
 
 The following code generates Chebyshev polynomials up to a given order::
@@ -164,7 +164,7 @@ The following code generates Chebyshev polynomials up to a given order::
 Approximation
 =============================
 
-Let :math:`(X, \mu)` be a compact Borel measure space and :math:`\mathcal{O}=\{u_1, u_2,\dots\}` an orthonormal basis of function whose span is dence in :math:`L^2(X, \mu)`.
+Let :math:`(X, \mu)` be a compact Borel measure space and :math:`\mathcal{O}=\{u_1, u_2,\dots\}` an orthonormal basis of function whose span is dense in :math:`L^2(X, \mu)`.
 Given a function :math:`f\in L^2(X, \mu)`, then `f` can be approximated as
 
 .. math::

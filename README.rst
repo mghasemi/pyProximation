@@ -1,8 +1,8 @@
 ========================
-IntgDiff Package
+pyProximation Package
 ========================
 
-This package is originally written to solve systems of integro-differential
+This package was originally written to solve systems of integro-differential
 equations via collocation method in arbitrary number of variables.
 The current implementation of the method is based on a finite dimensional
 orthogonal system of functions. Therefore additional modules were required 

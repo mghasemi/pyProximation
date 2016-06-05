@@ -71,10 +71,10 @@ The following code shows an example::
 	elif Symbolic == 'sage':
 		EQ1 = (diff(y, x, x) - diff(y, x) == R)
 	# corresponding coefficients
-	sries = S.Series(Z)
+	series = S.Series(Z)
 	# orthogonal approximation
-	ChAprx = sum([S.OrthBase[i]*sries[i] for i in range(m)])
-	# set up th collocation class
+	ChAprx = sum([S.OrthBase[i]*series[i] for i in range(m)])
+	# set up the collocation class
 	C = Collocation([x], [y], Symbolic)
 	# link to the orthogonal system
 	C.SetOrthSys(S)
@@ -190,7 +190,7 @@ The following example illustrates the usage of this method::
 .. image:: ./images/PDEplot.png
    :height: 400px
 
-A second method called ``interact`` is envoked at the end which called the ``mayavi`` library to show an interactive view of the surface.
+A second method called ``interact`` is invoked at the end which called the ``mayavi`` library to show an interactive view of the surface.
 
 .. image:: ./images/snapshot.png
    :height: 400px

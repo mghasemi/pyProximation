@@ -14,7 +14,7 @@ Continuous measure spaces
 For the continuous case, generally assume that the support of the measure is a product of closed interval, i.e.,
 :math:`\prod_{i=1}^{n}[a_i, b_i]`, where for each `i`, :math:`a_i<b_i`.
 Such a set can be defined as a list of ordered pairs of real numbers as ``[(a1, b1), (a2, b2), ..., (an, bn)]``.
-Moreover, when we speak about a subset of the support, we always refere to a box, defined as a list of 2-tuples.
+Moreover, when we speak about a subset of the support, we always refer to a box, defined as a list of 2-tuples.
 
 In this case, the measure is given implicitly as a density function :math:`w(x)`. So the measure of a set `S` is given by
 

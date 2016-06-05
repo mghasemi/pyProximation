@@ -18,7 +18,7 @@ In collocation method, one assumes that the solution of the equation is of a cer
 the assumed solution.
 More specifically, assume that :math:`u_1, u_2, \dots, u_n` are orthonormal functions and the solution is of the form :math:`f=\sum_i a_i u_i`
 where :math:`a_i` are unknowns. 
-Plug `f` in to the equation and choose `n` different admissible points. plug those points in to the resulting equation to elliminate `x`.
+Plug `f` in to the equation and choose `n` different admissible points. plug those points in to the resulting equation to eliminate `x`.
 Then we obtain `n` equations in terms of :math:`a_1,\dots, a_n`. Solving the resulted system of algebraic equations gives an approximation for `f`.
 
 Collocation class
@@ -27,7 +27,7 @@ Collocation class
 Single equation
 ---------------------
 
-The ``Collocation`` class implements the above described method. The follwing example solves the equation
+The ``Collocation`` class implements the above described method. The following example solves the equation
 :math:`\frac{dy}{dx} + 2y + 5 \int y dx = 1`, :math:`y(0)=y(2\pi)=0` where the exact solution is :math:`\frac{1}{2}\sin(2x)e^{-x}`::
 
 	from sympy import *
@@ -63,7 +63,7 @@ The ``Collocation`` class implements the above described method. The follwing ex
 	Apprx = C.Solve()
 	print Apprx[0]
 
-In the above example the ``Collocation`` class selects collocation points itself according to the measure choosen for orthogonal system, in this case,
+In the above example the ``Collocation`` class selects collocation points itself according to the measure chosen for orthogonal system, in this case,
 the usual Lebesgue measure. Thus, the class samples enough number of points uniformly from the domain. The solution and the exact answer are depicted 
 below:
 
@@ -71,7 +71,7 @@ below:
    :height: 400px
 
 One can provide prefered collocation points to the solver. The following repeats the previous example where collocation points are selected in a way from
-the domain within a fix distance from each other::
+the domain within a fixed distance from each other::
 
 	from sympy import *
 	from pyProximation import *
@@ -110,7 +110,7 @@ the domain within a fix distance from each other::
 	Apprx = C.Solve()
 	print Apprx[0]
 
-The result shows slight improvment in the solution:
+The result shows slight improvement in the solution:
 
 .. image:: ./images/CollExm01NoSmpl.png
    :height: 400px
@@ -124,7 +124,7 @@ System of equations
 -------------------------
 .. _ParamPlotExm:
 
-The ``Collocation`` class is also able to handel systems of equations. Consider the following system of partial differential equations:
+The ``Collocation`` class is also able to handle systems of equations. Consider the following system of partial differential equations:
 
 .. math::
 	\left\lbrace
@@ -176,7 +176,7 @@ The following code solves the system and plots the exact and approximate solutio
 	C.setSolver('scipy')
 	# solve to collocation system and print the solution
 	Apprx = C.Solve()
-	# print the answeres
+	# print the answers
 	print Apprx[0]
 	print Apprx[1]
 	# the exact solution

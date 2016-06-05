@@ -4,13 +4,14 @@
    contain the root `toctree` directive.
 
 Welcome to pyProximation's documentation!
-====================================
+============================================
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   introduction
    measures
    hilbert
    interpolation

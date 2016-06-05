@@ -21,7 +21,7 @@ are *Lagrange Basis Polynomials*.
 This procedure can be extended to multivariate case as well.
 
 Suppose that a list of points :math:`\{{x}_1,\dots,{x}_{\rho}\}` in :math:`\mathbb{R}^n` and a list of corresponding 
-values :math:`\{y_1,\dots,y_\rho\}` are given. Lets denote by :math:`{\bf X}` the tuple :math:`({\bf X}_1,\dots,{\bf X}_n)` of variables
+values :math:`\{y_1,\dots,y_\rho\}` are given. Let's denote by :math:`{\bf X}` the tuple :math:`({\bf X}_1,\dots,{\bf X}_n)` of variables
 and :math:`{\bf X}_1^{e_1}\cdots{\bf X}_n^{e_n}` by :math:`{\bf X}^{\bf e}`, where :math:`{\bf e}=(e_1,\dots,e_n)`.
 
 If for some :math:`m>0`, we have :math:`\rho={{m+n}\choose{m}}`, then the number of given points matches the number of monomials of
@@ -84,7 +84,7 @@ This will be the result:
 :math:`L^2`-approximation with discrete measures
 ==================================================
 Suppose that :math:`\mu=\sum_1^n\delta_{x_i}` is a measure with `n`-points in its support. Then the orthogonal system of polynomials consists of at most
-`n+1` polynomials. Approximation with these `n+1` polynomials is essencially same as interpolation::
+`n+1` polynomials. Approximation with these `n+1` polynomials is essentially same as interpolation::
 
 	# symbolic variable
 	x = Symbol('x')
