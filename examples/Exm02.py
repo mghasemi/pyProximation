@@ -1,5 +1,6 @@
 from sympy import *
-from Measure import *
+from pyProximation import *
+
 x = Symbol('x')
 y = Function('y')(x)
 
@@ -26,7 +27,7 @@ C.setSolver('scipy')
 Apprx = C.Solve()
 f = .5*exp(-x)*sin(2*x)
 
-G = plot(f, Apprx[0], (x, 0, 2*pi), show=False)
-G[0].line_color = 'blue'
-G[1].line_color = 'green'
+G = Graphics('sympy')
+G.Plot2D(f, (x, 0, 2*pi), color='blue', legend='Exact')
+G.Plot2D(Apprx[0], (x, 0, 2*pi), color='red', legend='Approximation')
 G.save('Exm02-%d.png'%(n))
