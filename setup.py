@@ -5,7 +5,7 @@ Description = """This package provides basic operations with measures, orthogona
 
 setup(
     name = 'pyProximation',
-    version = '1.0.0',
+    version = '1.1.0',
     author = 'Mehdi Ghasemi',
     author_email = 'mehdi.ghasemi@gmail.com',
     packages = ['pyProximation'],
