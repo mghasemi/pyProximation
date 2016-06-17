@@ -94,10 +94,11 @@ OrthSystem
 ========================
 
 Given a measure space, the ``OrthSystem`` class implements the described procedure, symbolically. Therefore, it relies on a symbolic environment.
-Currently, two such environments are acceptable:
+Currently, three such environments are acceptable:
 
 	1. `sympy`
 	2. `sage`
+	3. `symengine`
 
 Legendre polynomials
 -----------------------------

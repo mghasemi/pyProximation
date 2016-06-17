@@ -1,3 +1,4 @@
+# Solving a pde via collocation method
 Symbolic = 'sympy'
 
 if Symbolic == 'sympy':
@@ -10,6 +11,11 @@ elif Symbolic == 'sage':
 	t = var('t')
 	x = var('x')
 	y = function('y')(t, x)
+elif Symbolic == 'symengine':
+	from symengine import *
+	x = Symbol('x')
+	t = Symbol('t')
+	y = function_symbol('y', t, x)
 
 from pyProximation import *
 
@@ -27,15 +33,13 @@ Z = t*sin(pi*x)
 R = diff(Z, t) - diff(Z, x)
 if Symbolic == 'sympy':
 	EQ1 = Eq(diff(y, t) - diff(y, x), R)
+if Symbolic == 'symengine':
+	EQ1 = (diff(y, t) - diff(y, x) - R)
 elif Symbolic == 'sage':
 	EQ1 = diff(y, t) - diff(y, x) == R
 
-#sries = S.Series(Z)
-#ChAprx = sum([S.OrthBase[i]*sries[i] for i in range(m)])
-#G = plot(ChAprx, (x, -1, 1), color='green')
-
 C = Collocation([t, x], [y])
-C.SetOrthSys(S)
+C.SetOrthSys(S, y)
 C.Equation([EQ1])
 
 if Symbolic == 'sympy':
@@ -44,6 +48,12 @@ if Symbolic == 'sympy':
 	C.Condition(Eq(y, 0), [1, 1])
 	C.Condition(Eq(y, 1), [1, .5])
 	C.Condition(Eq(y, 0), [0, .7])
+elif Symbolic == 'symengine':
+	C.Condition(y, [0, 0])
+	C.Condition(y, [0, .3])
+	C.Condition(y, [1, 1])
+	C.Condition(y - 1, [1, .5])
+	C.Condition(y, [0, .7])
 elif Symbolic == 'sage':
 	C.Condition(y == 0, [0, 0])
 	C.Condition(y == 0, [0, .3])

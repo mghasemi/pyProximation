@@ -8,7 +8,7 @@ class Foundation:
 	def DetSymEnv(self):
 		"""
 		Returns a list. The list consists of all symbolic tools 
-		present among 'sympy' and 'sage'.
+		present among 'sympy','sage' and 'symengine'.
 		"""
 		Env = []
 		from sys import modules
@@ -16,4 +16,6 @@ class Foundation:
 			Env.append('sympy')
 		if 'sage' in modules:
 			Env.append('sage')
+		if 'symengine' in modules:
+			Env.append('symengine')
 		return Env

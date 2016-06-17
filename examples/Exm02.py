@@ -15,7 +15,7 @@ S.FormBasis()
 EQ1 = Eq(diff(y, x) + 2*y +5*integrate(y, x), 1)
 
 C = Collocation([x], [y])
-C.SetOrthSys(S)
+C.SetOrthSys(S, y)
 C.Equation([EQ1])
 
 C.Condition(Eq(y, 0), [0])

@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    introduction
+   symbolic
    measures
    hilbert
    interpolation

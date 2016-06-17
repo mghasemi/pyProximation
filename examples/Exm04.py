@@ -1,3 +1,4 @@
+# Interpolation and least square approximation w.r.t. a discrete measure
 from sympy import *
 from pyProximation import *
 

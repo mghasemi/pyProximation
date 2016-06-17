@@ -19,7 +19,8 @@ pyProximation relies on the following packages:
 		- `scipy <https://www.scipy.org/>`_ ,
 	+ for symbolic computation, either:
 		- `sympy <http://www.sympy.org/>`_ or,
-		- `sage <http://www.sagemath.org/>`_,
+		- `sage <http://www.sagemath.org/>`_ or,
+		- `symengine <https://github.com/symengine/symengine>`_,
 	+ for visualization:
 		- `mathplotlib <http://matplotlib.org/>`_,
 		- `mayavi <http://mayavi.sourceforge.net/>`_.

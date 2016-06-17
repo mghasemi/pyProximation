@@ -79,6 +79,8 @@ class Interpolation:
 		"""
 		if self.Env == 'sympy':
 			from sympy import Matrix, Subs
+		elif self.Env == 'symengine':
+			from symengine import Matrix, Subs
 		M = []
 		for j in range(self.num_points):
 			pnt = self.Points[j]

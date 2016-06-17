@@ -38,9 +38,8 @@ class Collocation(Foundation):
 	def SetOrthSys(self, obj, func):
 		"""
 		To approximate the solutions of the system of pdes, the class 
-		requires orthogonal systems of functions `OrthogonalSystem`, 
-		associated to each unknown function.
-		This method accepts such a system and the corresponding unknown.
+		requires an orthogonal system of functions `OrthogonalSystem`.
+		This method accepts such a system.
 		"""
 		assert isinstance(obj, OrthSystem), "An object of type `OrthSystem` is expected."
 		assert func in self.uFuncs, "`func` must be a function symbol given at initiation."
@@ -121,6 +120,9 @@ class Collocation(Foundation):
 			from sympy import Subs, expand, diff
 		elif self.Env == 'sage':
 			from sage.all import var, expand, diff
+		elif self.Env == 'symengine':
+			from symengine import Symbol as var
+			from symengine import expand, diff
 		# symbols for coefficients
 		var_syms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
 		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'
@@ -152,8 +154,10 @@ class Collocation(Foundation):
 							Teq = Teq.subs({diff(f, v, d_ord):diff(self.SR[var_syms[f_idx]], v, d_ord)})
 					if self.Env == 'sympy':
 						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
-					else:
-						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
+					elif self.Env == 'symengine':
+						Teq = expand(Teq.msubs({f:self.SR[var_syms[f_idx]]}))
+						Teq = expand(Teq.msubs({diff(f, v):diff(self.SR[var_syms[f_idx]], v)}))
+						Teq = expand(Teq.msubs({diff(diff(f, v), v):diff(diff(self.SR[var_syms[f_idx]], v), v)}))
 				f_idx += 1
 			if Teq not in self.REq:
 				self.REq.append(Teq)
@@ -171,6 +175,8 @@ class Collocation(Foundation):
 					Teq = Teq.subs({diff(f, v):diff(self.SR[var_syms[f_idx]], v)})
 					if self.Env == 'sympy':
 						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+					elif self.Env == 'symengine':
+						Teq = expand(Teq.msubs({f:self.SR[var_syms[f_idx]]}))
 					else:
 						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
 				f_idx += 1
@@ -215,6 +221,14 @@ class Collocation(Foundation):
 			if self.Env == 'sympy':
 				from sympy import lambdify
 				f_ = [lambdify(self.SymCF, (eq.lhs-eq.rhs), "numpy") for eq in numeric_eqs]
+				def f(x):
+					z = tuple(float(x.item(i)) for i in range(len(self.SymCF)))
+					return [fn(*z) for fn in f_]
+			elif self.Env == 'symengine':
+				from symengine import sympify
+				from sympy import lambdify
+				t_eqs = [sympify(eq) for eq in numeric_eqs]
+				f_ = [lambdify(self.SymCF, eq, "numpy") for eq in t_eqs]
 				def f(x):
 					z = tuple(float(x.item(i)) for i in range(len(self.SymCF)))
 					return [fn(*z) for fn in f_]

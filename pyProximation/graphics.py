@@ -121,6 +121,11 @@ class Graphics:
 		elif self.Env == 'sage':
 			from sage.all import fast_callable
 			f_ = fast_callable(func, vars=[xrng[0]])
+		elif self.Env == 'symengine':
+			from symengine import sympify
+			from sympy import lambdify
+			t_func = sympify(func)
+			f_ = lambdify(xrng[0], t_func, "numpy")
 		else:
 			raise Exception("The function type is not recognized. Only 'numeric', 'sympy' and 'sage' are accepted.")
 
@@ -167,6 +172,13 @@ class Graphics:
 			from sage.all import fast_callable
 			f_0 = fast_callable(funcs[0], vars=[rng[0]])
 			f_1 = fast_callable(funcs[1], vars=[rng[0]])
+		elif self.Env == 'symengine':
+			from symengine import sympify
+			from sympy import lambdify
+			t_f0 = sympify(funcs[0])
+			t_f1 = sympify(funcs[1])
+			f_0 = lambdify((xrng[0], yrng[0]), t_f0, "numpy")
+			f_1 = lambdify((xrng[0], yrng[0]), t_f1, "numpy")
 		else:
 			raise Exception("The function type is not recognized. Only 'numeric', 'sympy' and 'sage' are accepted.")
 
@@ -216,6 +228,11 @@ class Graphics:
 		elif self.Env == 'sage':
 			from sage.all import fast_callable
 			f_ = fast_callable(func, vars=[xrng[0], yrng[0]])
+		elif self.Env == 'symengine':
+			from symengine import sympify
+			from sympy import lambdify
+			t_func = sympify(func)
+			f_ = lambdify((xrng[0], yrng[0]), t_func, "numpy")
 		else:
 			raise Exception("The function type is not recognized. Only 'numeric', 'sympy' and 'sage' are accepted.")
 		#self.f_ = f_

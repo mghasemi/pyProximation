@@ -71,6 +71,8 @@ class OrthSystem(Foundation):
 			from sympy import sin, cos, pi
 		elif self.Env == 'sage':
 			from sage.all import sin, cos, pi
+		elif self.Env == 'symengine':
+			from symengine import sin, cos, pi
 		B = []
 		for o in product(range(n+1), repeat=self.num_vars):
 			if sum(o) <= n:
@@ -120,6 +122,9 @@ class OrthSystem(Foundation):
 			h = f*g +self.Vars[0]*0
 			H = fast_callable(h, vars=self.Vars)
 			F = lambda *x: H(*x)
+		elif self.Env == 'symengine':
+			from symengine import Lambdify
+			F = lambda *x: Lambdify(self.Vars, [f*g])(x)[0]
 		m = self.measure.integral(F)
 		return m
 
@@ -142,6 +147,8 @@ class OrthSystem(Foundation):
 			from sympy import expand, sqrt
 		elif self.Env == 'sage':
 			from sage.all import expand, sqrt
+		elif self.Env == 'symengine':
+			from symengine import expand, sqrt
 		for f in self.OriginalBasis:
 			nf = 0
 			for u in self.OrthBase:

@@ -4,6 +4,10 @@ if Symbolic == 'sympy':
 	from sympy import *
 	x = Symbol('x')
 	y = Function('y')(x)
+elif Symbolic == 'symengine':
+	from symengine import *
+	x = Symbol('x')
+	y = function_symbol('y', x)
 elif Symbolic == 'sage':
 	from sage.all import *
 	x = var('x')
@@ -28,6 +32,8 @@ R = diff(Z, x, x) - diff(Z, x)
 
 if Symbolic == 'sympy':
 	EQ1 = (Eq(diff(y, x, x) - diff(y, x), R))
+elif Symbolic == 'symengine':
+	EQ1 = (diff(y, x, x) - diff(y, x) - R)
 elif Symbolic == 'sage':
 	EQ1 = (diff(y, x, x) - diff(y, x) == R)
 
@@ -35,13 +41,17 @@ sries = S.Series(Z)
 ChAprx = sum([S.OrthBase[i]*sries[i] for i in range(m)])
 
 C = Collocation([x], [y], Symbolic)
-C.SetOrthSys(S)
+C.SetOrthSys(S, y)
 C.Equation([EQ1])
 
 if Symbolic == 'sympy':
 	C.Condition(Eq(y, 0), [0])
 	C.Condition(Eq(y, sin(-pi)*exp(-1)), [-1])
 	C.Condition(Eq(y, sin(pi)*exp(1)), [1])
+elif Symbolic == 'symengine':
+	C.Condition(y, [0])
+	C.Condition(y - sin(-pi)*exp(-1), [-1])
+	C.Condition(y - sin(pi)*exp(1), [1])
 elif Symbolic == 'sage':
 	C.Condition(y == 0, [0])
 	C.Condition(y == sin(-pi)*exp(-1), [-1])
