@@ -22,37 +22,58 @@ class Collocation(Foundation):
 		self.num_vars = len(variables) # Number of symbolic variables
 		self.uFuncs = ufunc # Unknown functions
 		self.num_funcs = len(ufunc) # Number of unknown functions
-		self.degree = 1 # Number of elements in the orthogonal basis
+		self.degree = [1 for _ in ufunc] # Number of elements in the orthogonal basis
 		self.EQs = [] # Lists of functional equations
 		self.Cnds = [] # Storage for initial and boundary conditions
 		self.CndVals = [] # Storage for the values of CND
 		self.Coeffs = {} 
 		self.Apprx = [] # Approximate solutions to uFuncs
 		self.Points = [] # Collocation points
+		self.OrthSys = {} # Orthogonal systems of functions corresponding to uFuncs
 		self.Solver = 'scipy' # The solver to find the roots
+		self.Domain = [(None, None) for v in self.Vars] # Reserved for the domain of variables
+		self.SampleMeasure = None # Reserved for the sampling measure
+		self.Verbose = False # Set True to see some messages about the procedure
 
-	def DetSymEnv(self):
-		"""
-		Returns a list. The list consists of all symbolic tools 
-		present among `sympy` and `sage`.
-		"""
-		Env = []
-		from sys import modules
-		if 'sympy' in modules:
-			Env.append('sympy')
-		if 'sage' in modules:
-			Env.append('sage')
-		return Env
-
-	def SetOrthSys(self, obj):
+	def SetOrthSys(self, obj, func):
 		"""
 		To approximate the solutions of the system of pdes, the class 
-		requires an orthogonal system of functions `OrthogonalSystem`.
-		This method accepts such a system.
+		requires orthogonal systems of functions `OrthogonalSystem`, 
+		associated to each unknown function.
+		This method accepts such a system and the corresponding unknown.
 		"""
 		assert isinstance(obj, OrthSystem), "An object of type `OrthSystem` is expected."
-		self.OrthSys = obj
-		self.degree = self.OrthSys.num_base
+		assert func in self.uFuncs, "`func` must be a function symbol given at initiation."
+		idx = self.uFuncs.index(func)
+		self.OrthSys[idx] = obj
+		self.degree[idx] = obj.num_base
+
+	def FindDomain(self):
+		"""
+		Finds the region that all variables are defined.
+		"""
+		dom = [list(tpl) for tpl in self.Domain]
+		for v_idx in range(self.num_vars):
+			v = self.Vars[v_idx]
+			for f in self.OrthSys:
+				Orth = self.OrthSys[f]
+				if v in Orth.Vars:
+					idx = Orth.Vars.index(v)
+					rng = Orth.Domain[idx]
+					if (dom[v_idx][0]==None) or (rng[0]<dom[v_idx][0]):
+						dom[v_idx][0] = rng[0]
+					if (dom[v_idx][1]==None) or (rng[1]>dom[v_idx][1]):
+						dom[v_idx][1] = rng[1]
+		self.Domain = [tuple(lst) for lst in dom]
+		# defines the default sampling measure object
+		self.SampleMeasure = Measure(self.Domain, 1)
+
+	def setSampleMeasure(self, meas):
+		"""
+		Sets the measure over the domain for sampling collocation points in case of necessity.
+		"""
+		assert isinstance(obj, Measure), "The input must be an instance of a `Measure` object."
+		self.SampleMeasure = meas
 
 	def Equation(self, eq):
 		"""
@@ -105,7 +126,7 @@ class Collocation(Foundation):
 		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'
 		'x', 'y', 'z']
 		# Produce enough symbolic variables
-		self.CF = {var_syms[s]:[var('%s%d'%(var_syms[s], i)) for i in range(self.degree)] for s in range(self.num_funcs)}
+		self.CF = {var_syms[s]:[var('%s%d'%(var_syms[s], i)) for i in range(self.degree[s])] for s in range(self.num_funcs)}
 		self.SymCF = []
 		for s in self.CF:
 			self.SymCF += self.CF[s]
@@ -116,10 +137,11 @@ class Collocation(Foundation):
 			s = var_syms[f_idx]
 			T = 0
 			# loop over elements of orthogonal basis
-			for i in range(self.degree):
-				T += self.CF[s][i]*(self.OrthSys.OrthBase[i])
+			for i in range(self.degree[f_idx]):
+				T += self.CF[s][i]*(self.OrthSys[f_idx].OrthBase[i])
 			self.SR[s] = T
 		# loop over entered equations
+		EQ_num = 0
 		for eq in self.EQs:
 			f_idx = 0
 			Teq = eq
@@ -135,6 +157,9 @@ class Collocation(Foundation):
 				f_idx += 1
 			if Teq not in self.REq:
 				self.REq.append(Teq)
+				EQ_num += 1
+				if self.Verbose:
+					print "Equation # %d generated."%(EQ_num)
 		# loop over initial and boundary conditions
 		cnd_idx = 0
 		for eq in self.Cnds:
@@ -144,12 +169,17 @@ class Collocation(Foundation):
 				for v_idx in range(self.num_vars):
 					v = self.Vars[v_idx]
 					Teq = Teq.subs({diff(f, v):diff(self.SR[var_syms[f_idx]], v)})
-					Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
+					if self.Env == 'sympy':
+						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+					else:
+						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
 				f_idx += 1
 			Teq = expand(Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(self.num_vars)}))
 			if Teq not in self.REq:
 				self.REq.append(Teq)
 			cnd_idx += 1
+			if self.Verbose:
+				print "Condition # %d added."%(cnd_idx)
 
 	def PlugPoints(self):
 		"""
@@ -157,6 +187,7 @@ class Collocation(Foundation):
 		variables and keep the coefficients.
 		"""
 		# Plug in the collocation points to form the algebraic equations
+
 		numeric_eqs = []
 		for p in self.Points:
 			chg = {self.Vars[i]:p[i] for i in range(self.num_vars)}
@@ -169,6 +200,8 @@ class Collocation(Foundation):
 		
 		if len(numeric_eqs) != len(self.SymCF):
 			raise Exception("Number of points and equations are not equal! Check the conditions.")
+		if self.Verbose:
+			print "Solving the system of equations numerically to extract coefficients ..."
 		# Solve the algebraic equations
 		if self.Solver == 'sage':
 			if self.Env != 'sage':
@@ -210,21 +243,34 @@ class Collocation(Foundation):
 		coefficients in `self.Coeffs` and returns a list of functions
 		in the span of orthoginal system.
 		"""
-		
-		num = self.degree - len(self.Points)
+		if self.Verbose:
+			print "Check for collocation points shortage..."
+		if self.SampleMeasure is None:
+			self.FindDomain()
+		num = max(self.degree) - len(self.Points)
 		# Check for too many points
 		if num < 0:
 			raise Exception("Too many points are associated. Reduce at least %d"%(-num))
 		cl_points = []
 		# Add enough random points to match up for variables
 		if num>0:
-			cl_points = self.OrthSys.measure.sample(num)
+			if self.Verbose:
+				print "Generating %d new collocation point ..."%(num)
+			cl_points = self.SampleMeasure.sample(num)
+		# attaching points
 		self.CollPoints(cl_points)
-
+		if self.Verbose:
+			print "Attaching %d collocation points:"%(len(self.Points))
+			for p in self.Points:
+				print p
+		if self.Verbose:
+			print "Generating algebraic equations based on given orthogonal systems of functions ..."
 		self.collocate()
-		
+		if self.Verbose:
+			print "Plug collocation points to extract system of equations ..."
 		self.Coeffs = self.PlugPoints()
-
+		if self.Verbose:
+			print "Done!"
 		for s in self.SR:
 			self.Apprx.append(self.SR[s].subs(self.Coeffs))
 		return self.Apprx

@@ -50,8 +50,8 @@ The ``Collocation`` class implements the above described method. The following e
 	EQ = Eq(diff(y, x) + 2*y +5*integrate(y, x), 1)
 	# initiate collocation object with x as variable and y as function
 	C = Collocation([x], [y])
-	# link the orthogonal system to the collocation object
-	C.SetOrthSys(S)
+	# link the orthogonal system to the collocation object and the unknown function `y`
+	C.SetOrthSys(S, y)
 	# link the equation to the collocation object
 	C.Equation([EQ])
 	# initial and boundary conditions
@@ -93,8 +93,8 @@ the domain within a fixed distance from each other::
 	EQ = Eq(diff(y, x) + 2*y +5*integrate(y, x), 1)
 	# initiate collocation object with x as variable and y as function
 	C = Collocation([x], [y])
-	# link the orthogonal system to the collocation object
-	C.SetOrthSys(S)
+	# link the orthogonal system to the collocation object and the unknown function `y`
+	C.SetOrthSys(S, y)
 	# link the equation to the collocation object
 	C.Equation([EQ])
 	# initial and boundary conditions
@@ -165,8 +165,9 @@ The following code solves the system and plots the exact and approximate solutio
 	EQ2 = Eq(x - diff(y, t) - y, 0)
 	# initiate collocation object with x as variable and y as function
 	C = Collocation([t], [x, y])
-	# link the orthogonal system to the collocation object
-	C.SetOrthSys(S)
+	# link the orthogonal system to the collocation object and unknown functions
+	C.SetOrthSys(S, x)
+	C.SetOrthSys(S, y)
 	# link the equation to the collocation object
 	C.Equation([EQ1, EQ2])
 	# initial and boundary conditions
