@@ -1,4 +1,5 @@
 from base import Foundation
+from measure import Measure
 from orthsys import OrthSystem
 
 class Collocation(Foundation):
@@ -18,6 +19,7 @@ class Collocation(Foundation):
 		if env not in Env:
 			raise Exception("The selected symbolic tool is not available.")
 		self.Env = env # The selected tool for symbolic computations
+		self.CommonSymFuncs(self.Env)
 		self.Vars = variables # Symbolic variables
 		self.num_vars = len(variables) # Number of symbolic variables
 		self.uFuncs = ufunc # Unknown functions
@@ -27,13 +29,19 @@ class Collocation(Foundation):
 		self.Cnds = [] # Storage for initial and boundary conditions
 		self.CndVals = [] # Storage for the values of CND
 		self.Coeffs = {} 
-		self.Apprx = [] # Approximate solutions to uFuncs
+		self.Apprx = {} # Approximate solutions to uFuncs
 		self.Points = [] # Collocation points
 		self.OrthSys = {} # Orthogonal systems of functions corresponding to uFuncs
 		self.Solver = 'scipy' # The solver to find the roots
+		self.SolverOption = 'lm' # Specifies scipy solver
 		self.Domain = [(None, None) for v in self.Vars] # Reserved for the domain of variables
 		self.SampleMeasure = None # Reserved for the sampling measure
 		self.Verbose = False # Set True to see some messages about the procedure
+		self.Success = None # Determines the final status of the solver: `True` for success and `False` for fail
+		self.InitPoint = [] # the initial point for solver. Its dimension must be equal to number of unknown coefficients
+		self.CfSyms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
+		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'
+		'x', 'y', 'z']
 
 	def SetOrthSys(self, obj, func):
 		"""
@@ -92,14 +100,24 @@ class Collocation(Foundation):
 		self.Cnds.append(eq)
 		self.CndVals.append(val)
 
-	def setSolver(self, solver):
+	def setSolver(self, solver, optn = 'lm'):
 		"""
 		Currently only two solvers are supported:
 		
 			1. the `sage`\`s defult solver for rather simple system of algebraic equations.
-			2. the `scipy`\`s `fsolves` to handel more complex and larger systems.
+			2. the `scipy`\`s `fsolves` to handel more complex and larger systems. 
+			It also supports the following solvers from scipy:
+
+				+ `hybr`
+				+ `lm` (defauls)
+				+ `broyden1`
+				+ `broyden2`
+				+ `anderson`
+				+ `krylov`
+				+ `df-sane`
 		"""
 		self.Solver = solver.lower()
+		self.SolverOption = optn
 
 	def CollPoints(self, pnts):
 		"""
@@ -115,20 +133,18 @@ class Collocation(Foundation):
 		Internal use: generates the system of equations for coefficients 
 		to be used via collocation points.
 		"""
-		if self.Env == 'sympy':
+		"""if self.Env == 'sympy':
 			from sympy import Symbol as var
 			from sympy import Subs, expand, diff
 		elif self.Env == 'sage':
 			from sage.all import var, expand, diff
 		elif self.Env == 'symengine':
 			from symengine import Symbol as var
-			from symengine import expand, diff
+			from symengine import expand, diff"""
 		# symbols for coefficients
-		var_syms = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
-		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w'
-		'x', 'y', 'z']
+		var_syms = self.CfSyms
 		# Produce enough symbolic variables
-		self.CF = {var_syms[s]:[var('%s%d'%(var_syms[s], i)) for i in range(self.degree[s])] for s in range(self.num_funcs)}
+		self.CF = {var_syms[s]:[self.Symbol('%s%d'%(var_syms[s], i)) for i in range(self.degree[s])] for s in range(self.num_funcs)}
 		self.SymCF = []
 		for s in self.CF:
 			self.SymCF += self.CF[s]
@@ -151,13 +167,13 @@ class Collocation(Foundation):
 				for v in self.Vars:
 					if self.Env == 'sage':
 						for d_ord in range(1,6):
-							Teq = Teq.subs({diff(f, v, d_ord):diff(self.SR[var_syms[f_idx]], v, d_ord)})
+							Teq = Teq.subs({self.diff(f, v, d_ord):self.diff(self.SR[var_syms[f_idx]], v, d_ord)})
 					if self.Env == 'sympy':
-						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+						Teq = (Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
 					elif self.Env == 'symengine':
-						Teq = expand(Teq.msubs({f:self.SR[var_syms[f_idx]]}))
-						Teq = expand(Teq.msubs({diff(f, v):diff(self.SR[var_syms[f_idx]], v)}))
-						Teq = expand(Teq.msubs({diff(diff(f, v), v):diff(diff(self.SR[var_syms[f_idx]], v), v)}))
+						Teq = (Teq.msubs({f:self.SR[var_syms[f_idx]]}))
+						Teq = (Teq.msubs({self.diff(f, v):self.diff(self.SR[var_syms[f_idx]], v)}))
+						Teq = (Teq.msubs({self.diff(self.diff(f, v), v):self.diff(self.diff(self.SR[var_syms[f_idx]], v), v)}))
 				f_idx += 1
 			if Teq not in self.REq:
 				self.REq.append(Teq)
@@ -172,15 +188,16 @@ class Collocation(Foundation):
 			for f in self.uFuncs:
 				for v_idx in range(self.num_vars):
 					v = self.Vars[v_idx]
-					Teq = Teq.subs({diff(f, v):diff(self.SR[var_syms[f_idx]], v)})
+					Teq = Teq.subs({self.diff(f, v):self.diff(self.SR[var_syms[f_idx]], v)})
 					if self.Env == 'sympy':
-						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
+						Teq = (Teq.subs({f:self.SR[var_syms[f_idx]]})).doit()
 					elif self.Env == 'symengine':
-						Teq = expand(Teq.msubs({f:self.SR[var_syms[f_idx]]}))
+						Teq = self.expand(Teq.msubs({f:self.SR[var_syms[f_idx]]}))
 					else:
-						Teq = expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
+						Teq = self.expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
 				f_idx += 1
-			Teq = expand(Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(self.num_vars)}))
+			Teq = self.expand(Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(len(self.CndVals[cnd_idx]))})) # needs more work (index of variables could be off)
+			#Teq = Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(len(self.CndVals[cnd_idx]))})
 			if Teq not in self.REq:
 				self.REq.append(Teq)
 			cnd_idx += 1
@@ -198,9 +215,13 @@ class Collocation(Foundation):
 		for p in self.Points:
 			chg = {self.Vars[i]:p[i] for i in range(self.num_vars)}
 			for eq in self.REq:
+				tp1 = type(eq)
 				Teq = eq.subs(chg)
-				if Teq not in numeric_eqs:
+				tp2 = type(Teq)
+				if (tp1 == tp2) and (Teq not in numeric_eqs):
 					numeric_eqs.append(Teq)
+				if len(numeric_eqs) >= len(self.SymCF):
+					break
 			if len(numeric_eqs) >= len(self.SymCF):
 				break
 		
@@ -215,9 +236,9 @@ class Collocation(Foundation):
 			sols = solve(numeric_eqs, self.SymCF, solution_dict=True)
 			sols = sols[0]
 			return sols
-		elif self.Solver in ['scipy', 'newton_krylov']:
-			from scipy import zeros
+		elif self.Solver in ['scipy']:
 			from scipy import optimize as opt
+			from random import uniform
 			if self.Env == 'sympy':
 				from sympy import lambdify
 				f_ = [lambdify(self.SymCF, (eq.lhs-eq.rhs), "numpy") for eq in numeric_eqs]
@@ -245,10 +266,19 @@ class Collocation(Foundation):
 					return EQs_
 			nvars = len(self.SymCF)
 			if self.Solver == 'scipy':
-				sol = list(opt.fsolve(f, tuple(0. for _ in range(nvars))))
-			elif self.Solver == 'newton_krylov':
-				sol = list(opt.newton_krylov(f,[0 for _ in range(nvars)]))
-			sols = {self.SymCF[i]: sol[i] for i in range(nvars)}
+				if self.InitPoint != []:
+					init_point = tuple(self.InitPoint)
+				else:
+					init_point = tuple(uniform(-0.1, 0.1) for _ in range(nvars))
+				sol = opt.root(f, init_point, method=self.SolverOption)
+			if sol.success:
+				sols = {self.SymCF[i]: list(sol.x)[i] for i in range(nvars)}
+				self.Success = True
+			else:
+				sols = {}
+				self.Success = False
+			if self.Verbose:
+				print sol.message
 			return sols
 	
 	def Solve(self):
@@ -285,6 +315,8 @@ class Collocation(Foundation):
 		self.Coeffs = self.PlugPoints()
 		if self.Verbose:
 			print "Done!"
-		for s in self.SR:
-			self.Apprx.append(self.SR[s].subs(self.Coeffs))
+		if self.Coeffs != {}:
+			for fn in self.uFuncs:
+				s = self.CfSyms[self.uFuncs.index(fn)]
+				self.Apprx[fn] = self.SR[s].subs(self.Coeffs)
 		return self.Apprx

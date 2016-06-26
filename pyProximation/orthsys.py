@@ -43,6 +43,7 @@ class OrthSystem(Foundation):
 		self.OriginalBasis = []
 		self.OrthBase = []
 		self.Numerical = False
+		self.CommonSymFuncs(self.Env)
 
 	def PolyBasis(self, n):
 		"""
@@ -67,12 +68,6 @@ class OrthSystem(Foundation):
 		"""
 		assert n>=0, "'n' must be a positive integer."
 		from itertools import product
-		if self.Env == "sympy":
-			from sympy import sin, cos, pi
-		elif self.Env == 'sage':
-			from sage.all import sin, cos, pi
-		elif self.Env == 'symengine':
-			from symengine import sin, cos, pi
 		B = []
 		for o in product(range(n+1), repeat=self.num_vars):
 			if sum(o) <= n:
@@ -83,9 +78,9 @@ class OrthSystem(Foundation):
 						period = self.Domain[idx][1]-self.Domain[idx][0]
 						if o[idx] != 0:
 							if ex[idx] == 0:
-								T_ *= cos(2*pi*o[idx]*self.Vars[idx]/period)
+								T_ *= self.cos(2*self.pi*o[idx]*self.Vars[idx]/period)
 							else:
-								T_ *= sin(2*pi*o[idx]*self.Vars[idx]/period)
+								T_ *= self.sin(2*self.pi*o[idx]*self.Vars[idx]/period)
 					B.append(T_)
 		return list(set(B))
 
@@ -143,18 +138,12 @@ class OrthSystem(Foundation):
 		is a list of function that are orthogonal to each other with
 		respect to the measure `measure` over the given range `Domain`.
 		"""
-		if self.Env == 'sympy':
-			from sympy import expand, sqrt
-		elif self.Env == 'sage':
-			from sage.all import expand, sqrt
-		elif self.Env == 'symengine':
-			from symengine import expand, sqrt
 		for f in self.OriginalBasis:
 			nf = 0
 			for u in self.OrthBase:
 				nf += self.project(f, u)
 			nf = f - nf
-			F = expand(nf/sqrt(self.inner(nf, nf)))
+			F = self.expand(nf/self.sqrt(self.inner(nf, nf)))
 			self.OrthBase.append(F)
 
 	def Series(self, f):
