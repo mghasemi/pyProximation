@@ -196,8 +196,8 @@ class Collocation(Foundation):
 					else:
 						Teq = self.expand(Teq.subs({f:self.SR[var_syms[f_idx]]}))
 				f_idx += 1
-			Teq = self.expand(Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(len(self.CndVals[cnd_idx]))})) # needs more work (index of variables could be off)
-			#Teq = Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(len(self.CndVals[cnd_idx]))})
+			#Teq = self.expand(Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(len(self.CndVals[cnd_idx]))})) # needs more work (index of variables could be off)
+			Teq = Teq.subs({self.Vars[v]:self.CndVals[cnd_idx][v] for v in range(len(self.CndVals[cnd_idx]))})
 			if Teq not in self.REq:
 				self.REq.append(Teq)
 			cnd_idx += 1
