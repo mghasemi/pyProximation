@@ -42,6 +42,12 @@ The class `Collocation`, takes a list of symbolic integro-differential
 equations, an orthonormal system of functions and some collocation points 
 (if provided) then finds approximate solutions of the system.
 
+subregion
+========================
+The `SubRegion` class partitions the region into sub-regions, solve 
+the system of Integro-differential equations on each and glue them 
+together.
+
 Graphics
 ========================
 

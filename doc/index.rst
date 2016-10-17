@@ -17,6 +17,7 @@ Contents:
    hilbert
    interpolation
    collocation
+   subregion
    graphics
    code
 

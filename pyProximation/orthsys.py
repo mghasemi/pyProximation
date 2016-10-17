@@ -87,6 +87,22 @@ class OrthSystem(Foundation):
                     B.append(T_)
         return list(set(B))
 
+    def TensorPrd(self, Bs):
+        """
+        Takses a list of symbolic bases, each one a list of symbolic 
+        expressions and returns the tensor product of them as a list.
+        """
+        assert (Bs != []), "Can not compute the tensor product of empty bases."
+        from itertools import product
+        TP = product(*Bs)
+        TBase = []
+        for itm in TP:
+            t_prd = 1
+            for ent in itm:
+                t_prd = t_prd * ent
+            TBase.append(self.expand(t_prd))
+        return TBase
+
     def SetMeasure(self, M):
         """
         To set the measure which the orthogonal system will be computed,
@@ -149,6 +165,15 @@ class OrthSystem(Foundation):
             nf = f - nf
             F = self.expand(nf / self.sqrt(self.inner(nf, nf)))
             self.OrthBase.append(F)
+        self.num_base = len(self.OrthBase)
+
+    def SetOrthBase(self, base):
+        """
+        Sets the orthonormal basis to be the given `base`.
+        """
+        assert (base != []), "Invalid basis."
+        self.OrthBase = base
+        self.num_base = len(self.OrthBase)
 
     def Series(self, f):
         """
