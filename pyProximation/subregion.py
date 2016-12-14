@@ -4,12 +4,15 @@ from orthsys import OrthSystem
 from collocation import Collocation
 
 
-class Mesh:
+class SubRegion(Foundation):
     """
-    This class partitions the region into sub-regions, solve the system of
-    Integro-differential equations on each and glue them together.
-    It takes a collocation instance and an optional list of positive integers 
-    which shows the number of equal length partitions for each variable.
+    The `SubRegion` class partitions the region into sub-regions, solve 
+    the system of Integro-differential equations on each and glue them 
+    together.
+
+    It takes: 
+            1) a collocation instance `collsys`;
+            2) an optional list of positive integers `num_parts` which shows the number of equal length partitions for each variable.
     """
 
     def __init__(self, collsys, num_parts=[]):
@@ -60,12 +63,14 @@ class Mesh:
             # add equations
             t_Coll.Equation(self.CollSys.EQs)
             t_Coll.Verbose = self.CollSys.Verbose
-            # append to the Mesh
+            # append to the Sub-regions
             self.MiniCollSys[tpl] = t_Coll
 
     def AnalyseConditions(self):
         """
-        Associates boundary conditions to each mini-collocation system.
+        Associates boundary conditions to each sub-collocation system.
+        Starting from one corner, associates boundary conditions to all
+        adjacent subregions based on the solution of the current subregion.
         """
         from itertools import product
         # walk through boundary conditions
@@ -89,7 +94,8 @@ class Mesh:
 
     def corners(self, tpl):
         """
-        Generates end corner points of the region represented `tpl` as collocation points.
+        Generates end corner points of the region represented `tpl` as 
+        collocation points (used internally).
         """
         from itertools import product
         pnts = []
@@ -134,12 +140,14 @@ class Mesh:
                         (self.Domain[idx][1] - self.Domain[idx]
                          [0]) / float(self.Parts[idx])
                     for f in self.CollSys.uFuncs:
-                        self.MiniCollSys[tuple(next_tpl)].Condition(
-                            Eq(f, Res[f]), cnd_val)
+                        if f in Res:
+                            self.MiniCollSys[tuple(next_tpl)].Condition(
+                                Eq(f, Res[f]), cnd_val)
 
     def ClosedForm(self, func):
         """
-        Compiles a piece-wise defined symbolic function from the solution for `func`.
+        Compiles a piece-wise defined symbolic function from the solution 
+        for `func` which is an unknown from the original collocation system.
         """
         from sympy import sign
         c_func = 0
@@ -148,11 +156,13 @@ class Mesh:
             mmbfunc = 1
             for v in self.CollSys.OrthSys[f_idx].Vars:
                 i = self.CollSys.Vars.index(v)
+                er_tol = 0.
                 r0 = self.Domain[i][
-                    0] + idx[i] * (self.Domain[i][1] - .00001 - self.Domain[i][0]) / float(self.Parts[i])
+                    0] + idx[i] * (self.Domain[i][1] - er_tol - self.Domain[i][0]) / float(self.Parts[i])
                 r1 = self.Domain[i][
-                    0] + (idx[i] + 1) * (self.Domain[i][1] - .00001 - self.Domain[i][0]) / float(self.Parts[i])
+                    0] + (idx[i] + 1) * (self.Domain[i][1] - er_tol - self.Domain[i][0]) / float(self.Parts[i])
                 mmbfunc *= (sign(self.Vars[i] - r0) + 1.) * \
                     (sign(r1 - self.Vars[i]) + 1.) / 4.
-            c_func += mmbfunc * self.Solutions[idx][func]
+            if func in self.Solutions[idx]:
+                c_func += mmbfunc * self.Solutions[idx][func]
         return c_func

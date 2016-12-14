@@ -16,5 +16,8 @@ Code Documentation
 .. automodule:: collocation
    :members:
 
+.. automodule:: subregion
+   :members:
+
 .. automodule:: graphics
    :members:

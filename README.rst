@@ -18,8 +18,7 @@ computations such as:
 	- calculate the measure of a set according to the given measure;
 	- calculate the integral of a function w.r.t. the measure;
 	- calculate the norm-p of a given function;
-	- generate samples from the support of the measure according to 
-	the distribution.
+	- generate samples from the support of the measure according to the distribution.
 
 orthsys
 ========================
@@ -42,6 +41,12 @@ The class `Collocation`, takes a list of symbolic integro-differential
 equations, an orthonormal system of functions and some collocation points 
 (if provided) then finds approximate solutions of the system.
 
+subregion
+========================
+The `SubRegion` class partitions the region into sub-regions, solve 
+the system of Integro-differential equations on each and glue them 
+together.
+
 Graphics
 ========================
 
@@ -50,7 +55,7 @@ symbolic or numeric functions based on `matplotlib`. The 3D plots also
 include interactive ones based on `mayavi`.
 
 
-For more detals refer to the documentation.
+For more detals refer to the `documentation <http://pyproximation.readthedocs.io/>`_.
 
 To build the documentation run::
 
