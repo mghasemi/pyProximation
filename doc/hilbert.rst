@@ -209,3 +209,52 @@ The following code calculates the Fourier series approximation of :math:`f(x)=\s
 	# form the approximation
 	f_app = sum([S.OrthBase[i]*Coeffs[i] for i in range(m)])
 	print f_app
+
+Rational Approximation
+=============================
+
+Let :math:`f:X\rightarrow\mathbb{R}` be a continuous function and :math:`\{b_0, b_1,\dots\}` an orthonormal system of functions over :math:`X`
+with respect to a measure :math:`\mu`. Suppose that we want to approximate :math:`f` with a function of the form :math:`\frac{p(x)}{q(x)}` 
+where :math:`p=\sum_{j=0}^m\alpha_jb_j` and :math:`q=1+\sum_{j=1}^n\beta_jb_j`. Let :math:`r(x)=p(x)-q(x)f(x)` be the residual. We can find
+the coefficients :math:`\alpha_i, \beta_j` such that :math:`\|r\|_2` be minimum.
+
+Let :math:`L(\alpha, \beta)=r(x)\cdot r(x)`. Then the solution satisfies the following equations:
+
+.. math::
+	\frac{\partial}{\partial \alpha_i}L = 0,\\
+	\frac{\partial}{\partial \beta_i}L = 0,
+
+which is a system of linear equations.
+This is implemented in ``rational.RationalAprox.RatLSQ``::
+
+	from sympy import *
+	from pyProximation import *
+
+	x = Symbol('x')
+	f = sinh(x) * cos(3 * x) + sin(3 * x) * exp(x)
+	D = [(-pi, pi)]
+	S = OrthSystem([x], D)
+	B = S.PolyBasis(5)
+
+	# link B to S
+	S.Basis(B)
+
+	# generate the orthonormal basis
+	S.FormBasis()
+
+	# extract the coefficients of approximations
+	Coeffs = S.Series(f)
+
+	# form the approximation
+	h = sum([S.OrthBase[i] * Coeffs[i] for i in range(len(S.OrthBase))])
+	T = RationalAprox(S)
+	g = T.RatLSQ(5, 5, f)
+
+	G = Graphics('sympy', 100)
+	G.Plot2D(f, (x, -3.2, 3.2), legend='exact')
+	G.Plot2D(g, (x, -3.2, 3.2), color='green', legend='rational')
+	G.Plot2D(h, (x, -3.2, 3.2), color='red', legend='Legendre')
+	G.save('Exm05.png')
+
+.. image:: ./images/rat.png
+   :height: 400px

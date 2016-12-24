@@ -4,7 +4,7 @@ from measure import Measure
 
 class OrthSystem(Foundation):
     """
-    `OrthogonalSystem` class produces an orthogonal system of functions
+    ``OrthogonalSystem`` class produces an orthogonal system of functions
     according to a suggested basis of functions and a given measure
     supported on a given region.
 
@@ -15,18 +15,18 @@ class OrthSystem(Foundation):
 
     To initiate an instance of this class one should provide a list of
     symbolic variables `variables` and the range of each variable as a
-    list of lists `var_range`.
+    list of lists ``var_range``.
 
             To initiate an orthogonal system of functions, one should provide
-            a list of symbolic variables `variables` and the range of each
-            these variables as a list of lists `var_range`.
+            a list of symbolic variables ``variables`` and the range of each
+            these variables as a list of lists ``var_range``.
     """
 
     def __init__(self, variables, var_range, env='sympy'):
         """
         To initiate an orthogonal system of functions, one should provide
-        a list of symbolic variables `variables` and the range of each
-        these variables as a list of lists `var_range`.
+        a list of symbolic variables ``variables`` and the range of each
+        these variables as a list of lists ``var_range``.
         """
         assert (type(variables) is list) and (type(var_range) is list), """The OrthSystem class object
 		requires two lists as inputs: (1) list of symbolic variables; (2) range of each variable."""
@@ -49,7 +49,7 @@ class OrthSystem(Foundation):
     def PolyBasis(self, n):
         """
         Generates a polynomial basis from variables consisting of all
-        monomials of degree at most `n`.
+        monomials of degree at most ``n``.
         """
         assert n >= 0, "'n' must be a positive integer."
         from itertools import product
@@ -65,7 +65,7 @@ class OrthSystem(Foundation):
     def FourierBasis(self, n):
         """
         Generates a Fourier basis from variables consisting of all
-        `sin` & `cos` functions with coefficients at most `n`.
+        :math:`sin` & :math:`cos` functions with coefficients at most `n`.
         """
         assert n >= 0, "'n' must be a positive integer."
         from itertools import product
@@ -116,7 +116,7 @@ class OrthSystem(Foundation):
     def Basis(self, base_set):
         """
         To specify a particular family of function as a basis, one should
-        call this method with a list `base_set` of linearly independent
+        call this method with a list ``base_set`` of linearly independent
         functions.
         """
         assert type(
@@ -127,7 +127,7 @@ class OrthSystem(Foundation):
     def inner(self, f, g):
         """
         Computes the inner product of the two parameters with respect to
-        the measure `measure`.
+        the measure ``measure``.
         """
         if self.Env == "sympy":
             from sympy import lambdify
@@ -145,18 +145,18 @@ class OrthSystem(Foundation):
 
     def project(self, f, g):
         """
-        Finds the projection of `f` on `g` with respect to the inner
-        product induced by the measure `measure`.
+        Finds the projection of ``f`` on ``g`` with respect to the inner
+        product induced by the measure ``measure``.
         """
         return g * self.inner(f, g) / self.inner(g, g)
 
     def FormBasis(self):
         """
         Call this method to generate the orthogonal basis corresponding
-        to the given basis via `Basis` method.
-        The result will be stored in a property called `OrthBase` which
+        to the given basis via ``Basis`` method.
+        The result will be stored in a property called ``OrthBase`` which
         is a list of function that are orthogonal to each other with
-        respect to the measure `measure` over the given range `Domain`.
+        respect to the measure ``measure`` over the given range ``Domain``.
         """
         for f in self.OriginalBasis:
             nf = 0

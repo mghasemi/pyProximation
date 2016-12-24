@@ -10,6 +10,9 @@ Code Documentation
 .. automodule:: orthsys
    :members:
 
+.. automodule:: rational
+   :members:
+
 .. automodule:: interpolation
    :members:
 

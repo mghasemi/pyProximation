@@ -5,13 +5,13 @@ from orthsys import OrthSystem
 
 class Collocation(Foundation):
     """
-    The `Collocation` class tries to approximate the solutions of a system
+    The ``Collocation`` class tries to approximate the solutions of a system
     of partial differential equations with respect to an orthogonal
     system of functions.
 
     To initiate an instance of this class one needs to provide two set of parameters:
             1) List of independent symbolic variables `variables`;
-            2) List of unknown functions to be found that depend on the independent variables `ufunc`.
+            2) List of unknown functions to be found that depend on the independent variables ``ufunc``.
     """
 
     def __init__(self, variables, ufunc, env='sympy'):
@@ -55,7 +55,7 @@ class Collocation(Foundation):
     def SetOrthSys(self, obj, func):
         """
         To approximate the solutions of the system of pdes, the class
-        requires an orthogonal system of functions `OrthogonalSystem`.
+        requires an orthogonal system of functions ``OrthSystem``.
         This method accepts such a system.
         """
         assert isinstance(
@@ -132,9 +132,9 @@ class Collocation(Foundation):
 
     def CollPoints(self, pnts):
         """
-        Accepts alist of collocation point `pnts`, to form the algebraic
+        Accepts alist of collocation point ``pnts``, to form the algebraic
         system of equations and find the coefficients of the orthogonal
-        functions from `OrthogonalSystem.OrthBase`. Each point must be
+        functions from ``OrthSystem.OrthBase``. Each point must be
         either a list or a tuple.
         """
         self.Points += pnts
@@ -311,7 +311,7 @@ class Collocation(Foundation):
     def Solve(self):
         """
         Solves the collocation equations and keep a dictionary of
-        coefficients in `self.Coeffs` and returns a list of functions
+        coefficients in ``self.Coeffs`` and returns a list of functions
         in the span of orthoginal system.
         """
         if self.Verbose:
