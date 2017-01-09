@@ -210,6 +210,87 @@ The following code calculates the Fourier series approximation of :math:`f(x)=\s
 	f_app = sum([S.OrthBase[i]*Coeffs[i] for i in range(m)])
 	print f_app
 
+Fitting Data
+-----------------------------
+
+Suppose that a set of data points :math:`(x_1,y_1),\dots,(x_m,y_m)` are given, where :math:`x_i\in\mathbb{R}^n`.
+To fit a curve or surface to data with minimum average square error, one can employ ``OrthSystem`` with an arbitrary
+system of functions to do so. The following example generates random data and fits two surfaces using polynomials
+and trigonometric functions::
+
+	from random import uniform
+	from sympy import *
+	from sympy.utilities.lambdify import lambdify, implemented_function
+	# import the module
+	from pyProximation import Measure, OrthSystem, Graphics
+	x, y, z = symbols('x, y, z')
+	# define dirac function symbolically and numerically
+	dirac = implemented_function(
+	    Function('dirac'), lambda a, b: 1 * (abs(a - b) < .000001))
+	# list of random points
+	points = [(uniform(0, 1), uniform(0, 1)) for _ in range(50)]
+	# container for the support of discrete measure
+	D = {}
+	# a symbolic function to represent the random points
+	g = 0
+	# Random values of the function
+	vals = []
+	for p in points:
+	    t = uniform(-.8, 1)
+	    vals.append(t)
+	    g += t * dirac(x, p[0]) * dirac(y, p[1])
+	    D[p] = 1
+	# The discrete measure supported at random points
+	M = Measure(D)
+	# Orthonormal systems of functions
+	S1 = OrthSystem([x, y], [(0, 1), (0, 1)])
+	S1.SetMeasure(M)
+
+	S2 = OrthSystem([x, y], [(0, 1), (0, 1)])
+	S2.SetMeasure(M)
+	# polynomial basis
+	B1 = S1.PolyBasis(4)
+	# trigonometric basis
+	B2 = S2.FourierBasis(3)
+	# link the basis to the orthogonal systems
+	S1.Basis(B1)
+	S2.Basis(B2)
+	# form the orthonormal basis
+	S1.FormBasis()
+	S2.FormBasis()
+	# calculate coefficients
+	cfs1 = S1.Series(g)
+	cfs2 = S2.Series(g)
+	# orthogonal approximation
+	aprx1 = sum([S1.OrthBase[i] * cfs1[i] for i in range(len(S1.OrthBase))])
+	aprx2 = sum([S2.OrthBase[i] * cfs2[i] for i in range(len(S2.OrthBase))])
+	# the graphic object
+	G1 = Graphics('sympy')
+	G2 = Graphics('sympy')
+	G1.Plot3D(aprx1, (x, 0, 1), (y, 0, 1))
+	G2.Plot3D(aprx2, (x, 0, 1), (y, 0, 1))
+	P = []
+	idx = 0
+	for p in points:
+	    q = (p[0], p[1], vals[idx])
+	    P.append(q)
+	    idx += 1
+	# link the points to the object
+	G1.Point(P, color='red')
+	G2.Point(P, color='red')
+	# save to file
+	G1.save('poly.png')
+	G2.save('trig.png')
+
+
+.. image:: ./images/poly.png
+   :height: 400px
+
+.. image:: ./images/trig.png
+   :height: 400px
+
+
+
 Rational Approximation
 =============================
 
