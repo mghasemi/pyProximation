@@ -1,7 +1,7 @@
-from base import Foundation
-from measure import Measure
-from orthsys import OrthSystem
-from collocation import Collocation
+from .base import Foundation
+from .measure import Measure
+from .orthsys import OrthSystem
+from .collocation import Collocation
 
 
 class SubRegion(Foundation):
@@ -125,8 +125,8 @@ class SubRegion(Foundation):
         corr_tpls = product(*self.breaks)
         for tpl in corr_tpls:
             if self.CollSys.Verbose:
-                print "Region index:", tpl
-                print "-------------------------------"
+                print("Region index:", tpl)
+                print("-------------------------------")
             if self.CornerCollPoints:
                 self.MiniCollSys[tpl].CollPoints(self.corners(tpl))
             Res = self.MiniCollSys[tpl].Solve()

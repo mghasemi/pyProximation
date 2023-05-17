@@ -27,7 +27,9 @@ C.setSolver('scipy')
 Apprx = C.Solve()
 f = .5*exp(-x)*sin(2*x)
 
+ks = list(Apprx.keys())
+
 G = Graphics('sympy')
 G.Plot2D(f, (x, 0, 2*pi), color='blue', legend='Exact')
-G.Plot2D(Apprx[0], (x, 0, 2*pi), color='red', legend='Approximation')
+G.Plot2D(Apprx[ks[0]], (x, 0, 2*pi), color='red', legend='Approximation')
 G.save('Exm02-%d.png'%(n))

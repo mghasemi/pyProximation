@@ -43,8 +43,8 @@ equations, an orthonormal system of functions and some collocation points
 
 subregion
 ========================
-The `SubRegion` class partitions the region into sub-regions, solve 
-the system of Integro-differential equations on each and glue them 
+The `SubRegion` class partitions the region into sub-regions, solve
+the system of Integro-differential equations on each and glue them
 together.
 
 Graphics

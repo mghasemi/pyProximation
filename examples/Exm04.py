@@ -22,7 +22,7 @@ f = exp(x*sin(x))
 sries = S.Series(f)
 intrpl = sum([S.OrthBase[i]*sries[i] for i in range(m)])
 
-print intrpl
+print(intrpl)
 
 G = Graphics('sympy')
 G.Plot2D(f, (x, -3.1, 3.1), legend='exact')

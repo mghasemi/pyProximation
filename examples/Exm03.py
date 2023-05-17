@@ -65,13 +65,14 @@ elif Symbolic == 'sage':
 C.setSolver('scipy')
 
 Apprx = C.Solve()
-print Apprx[0]
+ks = list(Apprx.keys())
+print(Apprx[ks[0]])
 
 G = Graphics(Symbolic)
 G.SetLabelX("$t$")
 G.SetLabelY("$x$")
 G.SetLabelZ("$y(t, x)$")
-G.Plot3D(Apprx[0], (t, 0, 1), (x, 0, 1))
+G.Plot3D(Apprx[ks[0]], (t, 0, 1), (x, 0, 1))
 
 G.save('Exm3-%d.png'%(n))
 G.interact()

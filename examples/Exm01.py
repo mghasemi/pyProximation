@@ -61,10 +61,11 @@ elif Symbolic == 'sage':
 
 C.setSolver('scipy')
 Apprx = C.Solve()
-print Apprx[0]
+ks = list(Apprx.keys())
+print(Apprx[ks[0]])
 G = Graphics(Symbolic)
 G.Plot2D(Z, (x, -1, 1), color='blue', legend='Exact')
 G.Plot2D(ChAprx, (x, -1, 1), color='green', legend='Orth Apprx')
-G.Plot2D(Apprx[0], (x, -1, 1), color='red', legend='Colloc Apprx')
+G.Plot2D(Apprx[ks[0]], (x, -1, 1), color='red', legend='Colloc Apprx')
 
 G.save('Exm01-%d.png'%(n))

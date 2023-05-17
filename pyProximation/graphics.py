@@ -300,7 +300,7 @@ class Graphics:
             # ax.set_xlim3d(self.xmin, self.xmin)
             # ax.set_ylim3d(self.ymin, self.ymax)
             # ax.set_zlim3d(0, 1)
-            ax = fig.gca(projection='3d')
+            ax = fig.add_subplot(projection='3d')
             alpha = 1
             for idx in range(len(self.pX)):
                 alpha = .6

@@ -1,6 +1,6 @@
-from base import Foundation
-from measure import Measure
-from orthsys import OrthSystem
+from .base import Foundation
+from .measure import Measure
+from .orthsys import OrthSystem
 
 from sympy import *
 
@@ -53,28 +53,3 @@ class RationalAprox(Foundation):
                          for i in range(n)])
         return numer / denom
 
-x = Symbol('x')
-y = Symbol('y')
-f = cos(y) + sin(x) * exp(x + y)
-D = [(-pi, pi), (-pi, pi)]
-S = OrthSystem([x, y], D)
-B = S.PolyBasis(6)
-# link B to S
-S.Basis(B)
-# generate the orthonormal basis
-S.FormBasis()
-print "Size of basis", len(S.OrthBase)
-# extract the coefficients of approximation
-Coeffs = S.Series(f)
-# form the approximation
-h = sum([S.OrthBase[i] * Coeffs[i] for i in range(len(S.OrthBase))])
-T = RationalAprox(S)
-g = T.RatLSQ(27, 27, f)
-print g
-print h
-k = 6
-for v in [i * pi / k for i in range(k + 1)]:
-    for w in [i * pi / k for i in range(k + 1)]:
-        print "_______________________"
-        print N(abs(g.subs({x: v, y: w}) - f.subs({x: v, y: w})))
-        print N(abs(h.subs({x: v, y: w}) - f.subs({x: v, y: w})))

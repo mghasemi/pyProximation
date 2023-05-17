@@ -1,4 +1,4 @@
-from base import Foundation
+from .base import Foundation
 
 
 class Measure(Foundation):
@@ -47,7 +47,7 @@ class Measure(Foundation):
         Checks the input types and their consistency, according to the
         *__init__* arguments.
         """
-        from types import FunctionType, IntType, LongType, FloatType
+        from types import FunctionType  # , IntType, LongType, FloatType
         if type(dom) == list:
             if not self.boxCheck(dom):
                 self.ErrorMsg = "Each member of the support's list must be a tuple of 2 elements"
@@ -55,10 +55,10 @@ class Measure(Foundation):
             self.DomType = "box"
             self.dim = len(dom)
             self.supp = dom
-            if type(w) not in [FunctionType, IntType, LongType, FloatType]:
-                self.ErrorMsg = "Weight must be a `function` defined over the support or a number"
-                return False
-            elif type(w) == FunctionType:
+            # if type(w) not in [FunctionType, IntType, LongType, FloatType]:
+            #     self.ErrorMsg = "Weight must be a `function` defined over the support or a number"
+            #     return False
+            if type(w) == FunctionType:
                 self.weight = w
             else:
                 self.weight = lambda *x: w

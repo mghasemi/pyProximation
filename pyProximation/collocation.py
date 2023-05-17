@@ -1,6 +1,6 @@
-from base import Foundation
-from measure import Measure
-from orthsys import OrthSystem
+from .base import Foundation
+from .measure import Measure
+from .orthsys import OrthSystem
 
 
 class Collocation(Foundation):
@@ -194,7 +194,7 @@ class Collocation(Foundation):
                 self.REq.append(Teq)
                 EQ_num += 1
                 if self.Verbose:
-                    print "Equation # %d generated." % (EQ_num)
+                    print("Equation # %d generated." % (EQ_num))
         # loop over initial and boundary conditions
         cnd_idx = 0
         for eq in self.Cnds:
@@ -223,7 +223,7 @@ class Collocation(Foundation):
                 self.REq.append(Teq)
             cnd_idx += 1
             if self.Verbose:
-                print "Condition # %d added." % (cnd_idx)
+                print("Condition # %d added." % (cnd_idx))
 
     def PlugPoints(self):
         """
@@ -250,7 +250,7 @@ class Collocation(Foundation):
             raise Exception(
                 "Number of points and equations are not equal! Check the conditions.")
         if self.Verbose:
-            print "Solving the system of equations numerically to extract coefficients ..."
+            print("Solving the system of equations numerically to extract coefficients ...")
         # Solve the algebraic equations
         if self.Solver == 'sage':
             if self.Env != 'sage':
@@ -305,7 +305,7 @@ class Collocation(Foundation):
                 sols = {}
                 self.Success = False
             if self.Verbose:
-                print sol.message
+                print(sol.message)
             return sols
 
     def Solve(self):
@@ -315,7 +315,7 @@ class Collocation(Foundation):
         in the span of orthoginal system.
         """
         if self.Verbose:
-            print "Check for collocation points shortage..."
+            print("Check for collocation points shortage...")
         if self.SampleMeasure is None:
             self.FindDomain()
         num = max(self.degree) - len(self.Points)
@@ -327,22 +327,22 @@ class Collocation(Foundation):
         # Add enough random points to match up for variables
         if num > 0:
             if self.Verbose:
-                print "Generating %d new collocation point ..." % (num)
+                print("Generating %d new collocation point ..." % (num))
             cl_points = self.SampleMeasure.sample(num)
         # attaching points
         self.CollPoints(cl_points)
         if self.Verbose:
-            print "Attaching %d collocation points:" % (len(self.Points))
+            print("Attaching %d collocation points:" % (len(self.Points)))
             for p in self.Points:
-                print p
+                print(p)
         if self.Verbose:
-            print "Generating algebraic equations based on given orthogonal systems of functions ..."
+            print("Generating algebraic equations based on given orthogonal systems of functions ...")
         self.collocate()
         if self.Verbose:
-            print "Plug collocation points to extract system of equations ..."
+            print("Plug collocation points to extract system of equations ...")
         self.Coeffs = self.PlugPoints()
         if self.Verbose:
-            print "Done!"
+            print("Done!")
         if self.Coeffs != {}:
             for fn in self.uFuncs:
                 s = self.CfSyms[self.uFuncs.index(fn)]
