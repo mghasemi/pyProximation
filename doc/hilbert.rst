@@ -94,11 +94,9 @@ OrthSystem
 ========================
 
 Given a measure space, the ``OrthSystem`` class implements the described procedure, symbolically. Therefore, it relies on a symbolic environment.
-Currently, three such environments are acceptable:
+Currently, the supported symbolic environment is:
 
 	1. `sympy`
-	2. `sage`
-	3. `symengine`
 
 Legendre polynomials
 -----------------------------
@@ -128,7 +126,7 @@ The following code generates Legendre polynomials up to a given order::
 	# generate the orthonormal basis
 	S.FormBasis()
 	# print the result
-	print B.OrthBase
+	print(S.OrthBase)
 
 Chebyshev polynomials
 ----------------------------
@@ -160,7 +158,7 @@ The following code generates Chebyshev polynomials up to a given order::
 	# generate the orthonormal basis
 	S.FormBasis()
 	# print the result
-	print S.OrthBase
+	print(S.OrthBase)
 
 Approximation
 =============================
@@ -208,7 +206,7 @@ The following code calculates the Fourier series approximation of :math:`f(x)=\s
 	Coeffs = S.Series(f)
 	# form the approximation
 	f_app = sum([S.OrthBase[i]*Coeffs[i] for i in range(m)])
-	print f_app
+	print(f_app)
 
 Fitting Data
 -----------------------------
@@ -219,11 +217,12 @@ system of functions to do so. The following example generates random data and fi
 and trigonometric functions::
 
 	from random import uniform
-	from sympy import *
-	from sympy.utilities.lambdify import lambdify, implemented_function
+	from sympy import Function, Symbol
+	from sympy.utilities.lambdify import implemented_function, lambdify
 	# import the module
-	from pyProximation import Measure, OrthSystem, Graphics
-	x, y, z = symbols('x, y, z')
+	from pyProximation import Measure, OrthSystem
+	x = Symbol('x')
+	y = Symbol('y')
 	# define dirac function symbolically and numerically
 	dirac = implemented_function(
 	    Function('dirac'), lambda a, b: 1 * (abs(a - b) < .000001))
@@ -264,30 +263,13 @@ and trigonometric functions::
 	# orthogonal approximation
 	aprx1 = sum([S1.OrthBase[i] * cfs1[i] for i in range(len(S1.OrthBase))])
 	aprx2 = sum([S2.OrthBase[i] * cfs2[i] for i in range(len(S2.OrthBase))])
-	# the graphic object
-	G1 = Graphics('sympy')
-	G2 = Graphics('sympy')
-	G1.Plot3D(aprx1, (x, 0, 1), (y, 0, 1))
-	G2.Plot3D(aprx2, (x, 0, 1), (y, 0, 1))
-	P = []
-	idx = 0
-	for p in points:
-	    q = (p[0], p[1], vals[idx])
-	    P.append(q)
-	    idx += 1
-	# link the points to the object
-	G1.Point(P, color='red')
-	G2.Point(P, color='red')
-	# save to file
-	G1.save('poly.png')
-	G2.save('trig.png')
-
-
-.. image:: ./images/poly.png
-   :height: 400px
-
-.. image:: ./images/trig.png
-   :height: 400px
+	# inspect the symbolic approximations
+	print(aprx1)
+	print(aprx2)
+	# compare the first sample numerically
+	f1 = lambdify((x, y), aprx1, 'numpy')
+	f2 = lambdify((x, y), aprx2, 'numpy')
+	print(vals[0], f1(*points[0]), f2(*points[0]))
 
 
 
@@ -306,10 +288,10 @@ Let :math:`L(\alpha, \beta)=r(x)\cdot r(x)`. Then the solution satisfies the fol
 	\frac{\partial}{\partial \beta_i}L = 0,
 
 which is a system of linear equations.
-This is implemented in ``rational.RationalAprox.RatLSQ``::
+This is implemented in ``rational.RationalApprox.RatLSQ``::
 
-	from sympy import *
-	from pyProximation import *
+	from sympy import Symbol, cos, exp, pi, sin, sinh
+	from pyProximation import OrthSystem, RationalApprox
 
 	x = Symbol('x')
 	f = sinh(x) * cos(3 * x) + sin(3 * x) * exp(x)
@@ -328,14 +310,8 @@ This is implemented in ``rational.RationalAprox.RatLSQ``::
 
 	# form the approximation
 	h = sum([S.OrthBase[i] * Coeffs[i] for i in range(len(S.OrthBase))])
-	T = RationalAprox(S)
+	T = RationalApprox(S)
 	g = T.RatLSQ(5, 5, f)
 
-	G = Graphics('sympy', 100)
-	G.Plot2D(f, (x, -3.2, 3.2), legend='exact')
-	G.Plot2D(g, (x, -3.2, 3.2), color='green', legend='rational')
-	G.Plot2D(h, (x, -3.2, 3.2), color='red', legend='Legendre')
-	G.save('Exm05.png')
-
-.. image:: ./images/rat.png
-   :height: 400px
+	print(h)
+	print(g)

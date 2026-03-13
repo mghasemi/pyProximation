@@ -28,15 +28,18 @@ class OrthSystem(Foundation):
         a list of symbolic variables ``variables`` and the range of each
         these variables as a list of lists ``var_range``.
         """
-        assert (type(variables) is list) and (type(var_range) is list), """The OrthSystem class object
-		requires two lists as inputs: (1) list of symbolic variables; (2) range of each variable."""
-        self.EnvAvail = self.DetSymEnv()
-        if self.EnvAvail == []:
-            raise Exception("No Symbolic tool is available.")
-        elif (env in self.EnvAvail):
-            self.Env = env
-        else:
-            raise Exception("The selected symbolic tool is not supported.")
+        if not isinstance(variables, list) or not isinstance(var_range, list):
+            raise TypeError(
+                "OrthSystem expects two lists: `variables` and `var_range`."
+            )
+        if len(variables) == 0:
+            raise ValueError("`variables` cannot be empty.")
+        if len(variables) != len(var_range):
+            raise ValueError("`variables` and `var_range` must have the same length.")
+        if env != 'sympy':
+            raise ValueError("Only 'sympy' is supported as symbolic environment.")
+        self.Env = 'sympy'
+        self.EnvAvail = ['sympy']
         self.Vars = variables
         self.num_vars = len(self.Vars)
         self.Domain = var_range
@@ -44,6 +47,7 @@ class OrthSystem(Foundation):
         self.OriginalBasis = []
         self.OrthBase = []
         self.Numerical = False
+        self._zero_tol = 1e-12
         self.CommonSymFuncs(self.Env)
 
     def PolyBasis(self, n):
@@ -51,7 +55,8 @@ class OrthSystem(Foundation):
         Generates a polynomial basis from variables consisting of all
         monomials of degree at most ``n``.
         """
-        assert n >= 0, "'n' must be a positive integer."
+        if not isinstance(n, int) or n < 0:
+            raise ValueError("`n` must be a non-negative integer.")
         from itertools import product
         B = []
         for o in product(range(n + 1), repeat=self.num_vars):
@@ -67,7 +72,11 @@ class OrthSystem(Foundation):
         Generates a Fourier basis from variables consisting of all
         :math:`sin` & :math:`cos` functions with coefficients at most `n`.
         """
-        assert n >= 0, "'n' must be a positive integer."
+        if not isinstance(n, int) or n < 0:
+            raise ValueError("`n` must be a non-negative integer.")
+        for interval in self.Domain:
+            if interval[0] == interval[1]:
+                raise ValueError("Fourier bases require non-degenerate intervals.")
         from itertools import product
         B = []
         for o in product(range(n + 1), repeat=self.num_vars):
@@ -92,7 +101,10 @@ class OrthSystem(Foundation):
         Takses a list of symbolic bases, each one a list of symbolic 
         expressions and returns the tensor product of them as a list.
         """
-        assert (Bs != []), "Can not compute the tensor product of empty bases."
+        if not isinstance(Bs, list) or Bs == []:
+            raise ValueError("Cannot compute a tensor product from an empty list of bases.")
+        if any(base == [] for base in Bs):
+            raise ValueError("Each basis in the tensor product must be non-empty.")
         from itertools import product
         TP = product(*Bs)
         TBase = []
@@ -110,7 +122,8 @@ class OrthSystem(Foundation):
         its parameter `dm`; i.e, the parameter is `d(m)` where `m` is
         the original measure.
         """
-        assert isinstance(M, Measure), "The argument must be a `Measure`."
+        if not isinstance(M, Measure):
+            raise TypeError("The argument must be a `Measure` instance.")
         self.measure = M
 
     def Basis(self, base_set):
@@ -119,8 +132,10 @@ class OrthSystem(Foundation):
         call this method with a list ``base_set`` of linearly independent
         functions.
         """
-        assert type(
-            base_set) is list, "A list of symbolic functions is expected."
+        if not isinstance(base_set, list):
+            raise TypeError("A list of symbolic functions is expected.")
+        if base_set == []:
+            raise ValueError("`base_set` cannot be empty.")
         self.OriginalBasis = base_set
         self.num_base = len(self.OriginalBasis)
 
@@ -129,18 +144,14 @@ class OrthSystem(Foundation):
         Computes the inner product of the two parameters with respect to
         the measure ``measure``.
         """
-        if self.Env == "sympy":
-            from sympy import lambdify
-            F = lambdify(self.Vars, f * g, "numpy")
-        elif self.Env == "sage":
-            from sage.all import fast_callable
-            h = f * g + self.Vars[0] * 0
-            H = fast_callable(h, vars=self.Vars)
-            F = lambda *x: H(*x)
-        elif self.Env == 'symengine':
-            from symengine import Lambdify
-            F = lambda *x: Lambdify(self.Vars, [f * g])(x)[0]
-        m = self.measure.integral(F)
+        from sympy import lambdify
+        F = lambdify(self.Vars, f * g, "numpy")
+        try:
+            m = self.measure.integral(F)
+        except Exception as error:
+            raise ValueError(
+                "Failed to evaluate the inner product on the current measure."
+            ) from error
         return m
 
     def project(self, f, g):
@@ -148,7 +159,10 @@ class OrthSystem(Foundation):
         Finds the projection of ``f`` on ``g`` with respect to the inner
         product induced by the measure ``measure``.
         """
-        return g * self.inner(f, g) / self.inner(g, g)
+        denominator = self.inner(g, g)
+        if abs(float(denominator)) < self._zero_tol:
+            raise ZeroDivisionError("Cannot project onto a zero-norm basis element.")
+        return g * self.inner(f, g) / denominator
 
     def FormBasis(self):
         """
@@ -158,12 +172,20 @@ class OrthSystem(Foundation):
         is a list of function that are orthogonal to each other with
         respect to the measure ``measure`` over the given range ``Domain``.
         """
+        if self.OriginalBasis == []:
+            raise ValueError("No basis has been set. Call `Basis()` first.")
+        self.OrthBase = []
         for f in self.OriginalBasis:
             nf = 0
             for u in self.OrthBase:
                 nf += self.project(f, u)
             nf = f - nf
-            F = self.expand(nf / self.sqrt(self.inner(nf, nf)))
+            norm_sq = self.inner(nf, nf)
+            if abs(float(norm_sq)) < self._zero_tol:
+                raise ValueError(
+                    "Cannot form an orthonormal basis from linearly dependent basis functions."
+                )
+            F = self.expand(nf / self.sqrt(norm_sq))
             self.OrthBase.append(F)
         self.num_base = len(self.OrthBase)
 
@@ -171,7 +193,8 @@ class OrthSystem(Foundation):
         """
         Sets the orthonormal basis to be the given `base`.
         """
-        assert (base != []), "Invalid basis."
+        if not isinstance(base, list) or base == []:
+            raise ValueError("`base` must be a non-empty list.")
         self.OrthBase = base
         self.num_base = len(self.OrthBase)
 
@@ -181,6 +204,8 @@ class OrthSystem(Foundation):
         coefficients of the	series that approximates `f` as a
         linear combination of the elements of the orthogonal basis.
         """
+        if self.OrthBase == []:
+            raise ValueError("No orthonormal basis is available. Call `FormBasis()` first.")
         cfs = []
         for b in self.OrthBase:
             cfs.append(self.inner(f, b))

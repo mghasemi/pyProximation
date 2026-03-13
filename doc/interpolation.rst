@@ -70,16 +70,7 @@ The above procedure is implemented in the ``Interpolation`` module. The followin
 	# interpolate
 	p = Inter.Interpolate(points, values)
 	# print the result
-	print p
-	G = Graphics('sympy')
-	points3d = [(-1, 1, -1), (-1, 0, 2), (0, 0, 0), (0, 1, 2), (1, 0, 1), (1, -1, 0)]
-	G.Point(points3d, color='red')
-	G.Plot3D(p, (x, -1.1, 1.1), (y, -1.1, 1.1))
-
-This will be the result:
-
-.. image:: ./images/InterpolationExm.png
-   :height: 400px
+	print(p)
 
 :math:`L^2`-approximation with discrete measures
 ==================================================
@@ -119,13 +110,4 @@ Suppose that :math:`\mu=\sum_1^n\delta_{x_i}` is a measure with `n`-points in it
 	# interpolate
 	Intrp = Interpolation([x])
 	intr = Intrp.Interpolate(Xs, Ys)
-	# plot the results
-	G = Graphics('sympy', numpoints=100)
-	G.SetTitle("$n = %d$"%(n))
-	G.Plot2D(g, (x, -l, l), color='blue', legend='Original')
-	G.Plot2D(aprx, (x, -l, l), color='red', legend='Orthogonal', thickness=2)
-	G.Plot2D(intr, (x, -l, l), color='green', legend='Interpolant')
-	G.save('OrthIntrp.png')
-
-.. image:: ./images/OrthIntrp.png
-   :height: 400px
+	print(intr)

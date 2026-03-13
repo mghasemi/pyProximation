@@ -29,7 +29,25 @@ class Measure(Foundation):
         self.dim = 0
         self.card = 0
         if not self.check(dom, w):
-            raise Exception(self.ErrorMsg)
+            raise ValueError(self.ErrorMsg)
+
+    def _call_on_point(self, func, point):
+        try:
+            return func(point)
+        except TypeError as original_error:
+            if isinstance(point, tuple):
+                try:
+                    return func(*point)
+                except TypeError as expanded_error:
+                    raise TypeError(
+                        "Failed to evaluate the integrand on support point %r. "
+                        "For tuple-valued support, provide a callable that accepts "
+                        "either a single tuple or one positional argument per coordinate."
+                        % (point,)
+                    ) from expanded_error
+            raise TypeError(
+                "Failed to evaluate the integrand on support point %r." % (point,)
+            ) from original_error
 
     def boxCheck(self, B):
         """
@@ -39,7 +57,9 @@ class Measure(Foundation):
         """
         flag = True
         for interval in B:
-            flag = flag and (type(interval) == tuple) and (len(interval) == 2)
+            flag = flag and isinstance(interval, tuple) and (len(interval) == 2)
+            if flag:
+                flag = flag and (interval[0] <= interval[1])
         return flag
 
     def check(self, dom, w):
@@ -47,31 +67,34 @@ class Measure(Foundation):
         Checks the input types and their consistency, according to the
         *__init__* arguments.
         """
-        from types import FunctionType  # , IntType, LongType, FloatType
-        if type(dom) == list:
+        from numbers import Number
+        if isinstance(dom, list):
             if not self.boxCheck(dom):
-                self.ErrorMsg = "Each member of the support's list must be a tuple of 2 elements"
+                self.ErrorMsg = "Each support interval must be a 2-tuple `(lower, upper)` with `lower <= upper`."
                 return False
             self.DomType = "box"
             self.dim = len(dom)
             self.supp = dom
-            # if type(w) not in [FunctionType, IntType, LongType, FloatType]:
-            #     self.ErrorMsg = "Weight must be a `function` defined over the support or a number"
-            #     return False
-            if type(w) == FunctionType:
+            if w is None:
+                self.ErrorMsg = "A continuous measure requires a weight function or a numeric constant."
+                return False
+            if callable(w):
                 self.weight = w
-            else:
+            elif isinstance(w, Number):
                 self.weight = lambda *x: w
-        elif type(dom) == dict:
+            else:
+                self.ErrorMsg = "Weight must be either a callable or a numeric constant."
+                return False
+        elif isinstance(dom, dict):
             if len(dom) == 0:
-                self.ErrorMsg = "A measure can not have an empty support"
+                self.ErrorMsg = "A discrete measure cannot have an empty support."
                 return False
             self.DomType = "set"
             self.card = len(dom)
-            self.supp = dom.keys()
+            self.supp = tuple(dom.keys())
             self.weight = dom
         else:
-            self.ErrorMsg = "First parameter must be either a list of 2-tupels or a dictionary"
+            self.ErrorMsg = "The support must be either a list of intervals or a dictionary of point masses."
             return False
         return True
 
@@ -82,15 +105,14 @@ class Measure(Foundation):
         """
         m = 0
         if self.DomType == "set":
-            if type(S) not in [set, list, tuple]:
-                raise Exception(
-                    "The type of the given set must be either `set`, `list` or `tuple`")
+            if not isinstance(S, (set, list, tuple)):
+                raise TypeError("A discrete subset must be a `set`, `list`, or `tuple`.")
             for p in S:
                 if p in self.supp:
                     m += self.weight[p]
         else:
-            if (type(S) != list) or (not self.boxCheck(S)):
-                raise Exception("The given set must be a list of 2-tuples")
+            if (not isinstance(S, list)) or (not self.boxCheck(S)):
+                raise TypeError("A continuous subset must be a list of 2-tuples.")
             from scipy import integrate
             m = integrate.nquad(self.weight, S)[0]
         return m
@@ -100,25 +122,20 @@ class Measure(Foundation):
         Returns the integral of `f` with respect to the currwnt measure
         over the support.
         """
-        from types import FunctionType
         m = 0
         if self.DomType == "set":
-            if type(f) not in [dict, FunctionType]:
-                raise Exception(
-                    "The integrand must be a `function` or a `dict`")
-            if type(f) == dict:
+            if not isinstance(f, dict) and not callable(f):
+                raise TypeError("For a discrete measure, the integrand must be a `dict` or a callable.")
+            if isinstance(f, dict):
                 for p in self.supp:
                     if p in f:
                         m += self.weight[p] * f[p]
             else:
                 for p in self.supp:
-                    try:
-                        m += self.weight[p] * f(p)
-                    except:
-                        pass
+                    m += self.weight[p] * self._call_on_point(f, p)
         else:
-            if type(f) != FunctionType:
-                raise Exception("The integrand must be a `function`")
+            if not callable(f):
+                raise TypeError("For a continuous measure, the integrand must be callable.")
             from scipy import integrate
             fw = lambda *x: f(*x) * self.weight(*x)
             m = integrate.nquad(fw, self.supp)[0]
@@ -129,6 +146,10 @@ class Measure(Foundation):
         Computes the norm-`p` of the `f` with respect to the current measure.
         """
         from math import pow
+        if p <= 0:
+            raise ValueError("The norm order `p` must be positive.")
+        if not callable(f):
+            raise TypeError("The norm expects a callable integrand.")
         absfp = lambda *x: pow(abs(f(*x)), p)
         return pow(self.integral(absfp), 1. / p)
 
@@ -137,7 +158,8 @@ class Measure(Foundation):
         Samples from the support according to the measure.
 
         """
-        assert num >= 1, "Sample size must be a positive integer number."
+        if not isinstance(num, int) or num < 1:
+            raise ValueError("Sample size must be a positive integer.")
         if self.DomType == 'box':
             from math import ceil, pow
             from itertools import product
@@ -153,8 +175,10 @@ class Measure(Foundation):
                                   [0] + (o[i] + 1) * delta[i]) for i in range(self.dim)]
             numpnts = max(num, len(SubRegions))
             muSupp = self.measure(self.supp)
+            if muSupp <= 0:
+                raise ValueError("Cannot sample from a continuous measure with non-positive total mass.")
             for o in SubRegions:
-                NumSample[o] = ceil(numpnts * self.measure(SubRegions[o]))
+                NumSample[o] = int(ceil(numpnts * self.measure(SubRegions[o]) / float(muSupp)))
             for o in NumSample:
                 pnts = []
                 while len(pnts) < NumSample[o]:
@@ -165,10 +189,13 @@ class Measure(Foundation):
                     if v not in pnts:
                         pnts.append(v)
                 points += pnts
-            return random.sample(set(points), num)
+            return random.sample(points, num)
         else:
-            from scipy import stats
-            TotM = self.measure(self.supp)
-            dist = [float(self.weight[p]) / TotM for p in self.supp]
-            custm = stats.rv_discrete(name='custm', values=(self.supp, dist))
-            return custm.rvs(size=num)
+            weights = [self.weight[p] for p in self.supp]
+            if any(weight < 0 for weight in weights):
+                raise ValueError("Cannot sample from a discrete measure with negative weights.")
+            TotM = sum(weights)
+            if TotM <= 0:
+                raise ValueError("Cannot sample from a discrete measure with non-positive total mass.")
+            from random import choices
+            return choices(self.supp, weights=weights, k=num)

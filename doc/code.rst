@@ -1,26 +1,17 @@
 Code Documentation
 =================================
 
-.. automodule:: base
+.. automodule:: pyProximation.base
    :members:
 
-.. automodule:: measure
+.. automodule:: pyProximation.measure
    :members:
 
-.. automodule:: orthsys
+.. automodule:: pyProximation.orthsys
    :members:
 
-.. automodule:: rational
+.. automodule:: pyProximation.rational
    :members:
 
-.. automodule:: interpolation
-   :members:
-
-.. automodule:: collocation
-   :members:
-
-.. automodule:: subregion
-   :members:
-
-.. automodule:: graphics
+.. automodule:: pyProximation.interpolation
    :members:

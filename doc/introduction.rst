@@ -3,10 +3,9 @@ Introduction
 =====================
 
 This is a brief documentation for using *pyProximation*.
-pyProximation was originally written to solve systems of integro-differential
-equations via collocation method in arbitrary number of variables.
-The current implementation of the method is based on a finite dimensional
-orthogonal system of functions.
+pyProximation provides tools for function approximation in Hilbert spaces.
+It uses orthogonal systems of functions built via the Gram-Schmidt procedure
+over measures on arbitrary domains.
 
 Requirements and dependencies
 ===============================
@@ -17,15 +16,8 @@ pyProximation relies on the following packages:
 	+ for numerical calculation:
 		- `numpy <http://www.numpy.org/>`_,
 		- `scipy <https://www.scipy.org/>`_ ,
-	+ for symbolic computation, either:
-		- `sympy <http://www.sympy.org/>`_ or,
-		- `sage <http://www.sagemath.org/>`_ or,
-		- `symengine <https://github.com/symengine/symengine>`_,
-	+ for visualization:
-		- `mathplotlib <http://matplotlib.org/>`_,
-		- `mayavi <http://mayavi.sourceforge.net/>`_.
-
-For the symbolic computation, pyProximation need the presence of either `sympy` or `sage`.
+	+ for symbolic computation:
+		- `sympy <http://www.sympy.org/>`_
 
 Download
 ================

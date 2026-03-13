@@ -12,13 +12,9 @@ Contents:
    :maxdepth: 2
 
    introduction
-   symbolic
    measures
    hilbert
    interpolation
-   collocation
-   subregion
-   graphics
    code
 
 Indices and tables

@@ -14,5 +14,5 @@ setup(
     description=Description,
     long_description=open('README.rst').read(),
     keywords="approximation, interpolation, measures, collocation",
-    install_requires=['sympy', 'numpy', 'scipy', 'matplotlib', 'itertools']
+    install_requires=['sympy', 'numpy', 'scipy']
 )

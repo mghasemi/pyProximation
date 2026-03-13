@@ -8,33 +8,18 @@ class Foundation:
 
     def DetSymEnv(self):
         """
-        Returns a list. The list consists of all symbolic tools
-        present among 'sympy','sage' and 'symengine'.
+        Returns ``['sympy']`` when sympy is available.
         """
-        Env = []
-        from sys import modules
-        if 'sympy' in modules:
-            Env.append('sympy')
-        if 'sage' in modules:
-            Env.append('sage')
-        if 'symengine' in modules:
-            Env.append('symengine')
-        return Env
+        try:
+            import sympy  # noqa: F401
+            return ['sympy']
+        except ImportError:
+            return []
 
     def CommonSymFuncs(self, env):
-        if env == 'sympy':
-            from sympy import expand, sqrt, sin, cos, pi, diff
-            from sympy import Symbol as Symbol
-            # from sympy import Function as SymFunc
-        elif env == 'sage':
-            from sage.all import expand, sqrt, sin, cos, pi, diff
-            from sympy import var as Symbol
-            # from sympy import function as SymFunc
-        elif env == 'symengine':
-            from symengine import expand, sqrt, sin, cos, pi, diff
-            from sympy import Symbol as Symbol
-            # from sympy import function_symbol as SymFunc
-
+        if env != 'sympy':
+            raise ValueError("Only 'sympy' is supported as symbolic environment.")
+        from sympy import expand, sqrt, sin, cos, pi, diff, Symbol
         self.expand = expand
         self.sqrt = sqrt
         self.sin = sin

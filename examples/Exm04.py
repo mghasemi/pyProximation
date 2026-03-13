@@ -1,6 +1,13 @@
 # Interpolation and least square approximation w.r.t. a discrete measure
-from sympy import *
-from pyProximation import *
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+	sys.path.insert(0, str(ROOT))
+
+from sympy import Symbol, Function, exp, sin, pprint
+from pyProximation import Measure, OrthSystem
 
 x = Symbol('x')
 y = Function('y')(x)
@@ -22,9 +29,4 @@ f = exp(x*sin(x))
 sries = S.Series(f)
 intrpl = sum([S.OrthBase[i]*sries[i] for i in range(m)])
 
-print(intrpl)
-
-G = Graphics('sympy')
-G.Plot2D(f, (x, -3.1, 3.1), legend='exact')
-G.Plot2D(intrpl, (x, -3.1, 3.1), color='green', legend='approximation')
-G.save('Exm04-%d.png'%(n))
+pprint(intrpl)

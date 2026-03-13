@@ -8,9 +8,13 @@ class Interpolation:
 
     def __init__(self, var, env="sympy"):
         """
-        `var` is the list of symbolic variables and `env` is the the symbolic tool.
+        `var` is the list of symbolic variables.
         """
-        self.Env = env
+        if not isinstance(var, list) or var == []:
+            raise TypeError("`var` must be a non-empty list of symbolic variables.")
+        if env != 'sympy':
+            raise ValueError("Only 'sympy' is supported as symbolic environment.")
+        self.Env = 'sympy'
         self.Vars = var
         self.num_vars = len(var)
         self.degree = 1
@@ -24,25 +28,31 @@ class Interpolation:
         checks for the valididty of the input. In case of failure, describes the type
         of error occured according to the inputs.
         """
-        assert len(
-            points) > 0, "Unable to interpolate over an empty set of points."
-        assert len(points) == len(
-            vals), "Number of points anf provided values does not match."
+        if not isinstance(points, list) or points == []:
+            raise ValueError("Unable to interpolate over an empty set of points.")
+        if not isinstance(vals, list):
+            raise TypeError("`vals` must be provided as a list.")
+        if len(points) != len(vals):
+            raise ValueError("The number of points does not match the number of values.")
         # check dimension consistency
-        if len(points[0]) != self.num_vars:
-            raise Exception(
-                "The given points must be %d dimensional." % (self.num_vars))
+        for point in points:
+            if not isinstance(point, (list, tuple)):
+                raise TypeError("Each interpolation point must be a list or tuple.")
+            if len(point) != self.num_vars:
+                raise ValueError(
+                    "Each interpolation point must be %d-dimensional." % (self.num_vars)
+                )
         self.num_points = len(points)
         # the least number of extra points required
         mnp = self.MinNumPoints()
         # check the sufficiency of points
         if mnp > 0:
-            raise Exception("At least %d more points and values required")
-        self.Points = points
+            raise ValueError("At least %d more points and values are required." % (mnp))
+        self.Points = [tuple(point) for point in points]
         self.Monomials()
         delta = self.Delta()
         if delta == 0:
-            raise Exception("Cannot find a unique interpolant.")
+            raise ValueError("Cannot find a unique interpolant from the given points.")
         p = 0
         for i in range(self.num_points):
             p += vals[i] * self.Delta(i) / delta
@@ -81,10 +91,9 @@ class Interpolation:
         Construct the matrix corresponding to `idx`'th point, if `idx>0`
         Otherwise returns the discriminant.
         """
-        if self.Env == 'sympy':
-            from sympy import Matrix, Subs
-        elif self.Env == 'symengine':
-            from symengine import Matrix, Subs
+        if idx < -1 or idx >= self.num_points:
+            raise IndexError("`idx` must be -1 or the index of an interpolation point.")
+        from sympy import Matrix
         M = []
         for j in range(self.num_points):
             pnt = self.Points[j]
